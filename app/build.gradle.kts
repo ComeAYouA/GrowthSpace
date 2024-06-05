@@ -21,7 +21,9 @@ dependencies {
     implementation(libs.androidx.splashscreen)
 
 
-    implementation(project(":core:data"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:model"))
     implementation(project(":feature:login"))
     implementation(project(":feature:projects"))
+    implementation(project(":feature:onboarding"))
 }

@@ -2,8 +2,11 @@ package comeayoua.growthspace.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import comeayoua.growthspace.login.navigation.loginScreen
+import comeayoua.growthspace.login.navigation.navigateToLoginScreen
+import comeayoua.growthspace.onboarding.navigation.onBoardingScreen
 import comeayoua.growthspace.projects.navigation.projectsScreen
 
 
@@ -22,8 +25,8 @@ fun GrowthSpaceNavHost(
     ){
         loginScreen()
         projectsScreen()
+        onBoardingScreen(
+            onStartButtonClicked = { navController.navigateToLoginScreen()}
+        )
     }
 }
-
-val AppUiState.startDestination: String
-    get() = if (this.isUserLoggedIn) "PROJECTS_ROUTE" else "LOGIN_ROUTE"

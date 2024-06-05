@@ -7,13 +7,14 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import comeayoua.growthspace.model.UserData
 
 
 @Composable
 fun rememberAppUiState(
     windowSizeClass: WindowSizeClass,
     navController: NavHostController = rememberNavController(),
-    isUserLoggedIn: Boolean
+    userData: UserData
 ): AppUiState {
     return remember(
         windowSizeClass
@@ -21,7 +22,7 @@ fun rememberAppUiState(
         AppUiState(
             windowSizeClass,
             navController,
-            isUserLoggedIn
+            userData
         )
     }
 }
@@ -30,8 +31,20 @@ fun rememberAppUiState(
 class AppUiState(
     private val windowSizeClass: WindowSizeClass,
     val navController: NavHostController,
-    val isUserLoggedIn: Boolean
+    private val userData: UserData,
 ) {
+
+    val startDestination: String
+    get() = if (userData.isUserLoggedIn) {
+        "PROJECTS_ROUTE"
+    } else {
+        if (userData.isOnboarded){
+            "LOGIN_ROUTE"
+        } else {
+            "ONBOARDING_ROUTE"
+        }
+    }
+
     val shouldShowBottomNavigationBar: Boolean
         get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
 
