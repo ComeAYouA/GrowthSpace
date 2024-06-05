@@ -32,7 +32,7 @@ interface NetworkModule {
                     host = "supabase.com"
                 }
                 install(ComposeAuth){
-                    googleNativeLogin(serverClientId = "73464672483-n7seudr3q7kdkc5dcidsfejet14nruuf.apps.googleusercontent.com")
+                    googleNativeLogin(BuildConfig.clientId)
                 }
                 install(Postgrest)
                 install(Storage)

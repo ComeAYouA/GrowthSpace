@@ -14,5 +14,5 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.supabase.gotrue)
 }

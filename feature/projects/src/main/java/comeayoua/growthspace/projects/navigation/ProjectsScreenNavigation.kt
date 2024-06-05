@@ -10,8 +10,8 @@ import comeayoua.growthspace.projects.Projects
 const val PROJECTS_ROUTE = "projects_route"
 private const val URI_PATTERN_LINK = "https://www.comayoua.growthspace/projects"
 
-fun NavController.navigateToProjectsScreen(navOptions: NavOptions)
-        = this.navigate(PROJECTS_ROUTE, navOptions)
+fun NavController.navigateToProjectsScreen()
+        = this.navigate(PROJECTS_ROUTE)
 
 fun NavGraphBuilder.projectsScreen() {
     composable(

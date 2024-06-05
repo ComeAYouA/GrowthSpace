@@ -10,8 +10,8 @@ import androidx.navigation.navDeepLink
 const val LOGIN_ROUTE = "login_route"
 private const val URI_PATTERN_LINK = "https://www.comayoua.growthspace/login"
 
-fun NavController.navigateToLoginScreen(navOptions: NavOptions)
-        = this.navigate(LOGIN_ROUTE, navOptions)
+fun NavController.navigateToLoginScreen()
+        = this.navigate(LOGIN_ROUTE)
 
 fun NavGraphBuilder.loginScreen() {
     composable(
