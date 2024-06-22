@@ -39,18 +39,16 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import comeayoua.growthspace.onboarding.ui.model.rememberOnBoardingPages
 
 
-@Preview
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnBoardingScreen(
     modifier: Modifier = Modifier,
-    onStartButtonClicked: () -> Unit = {}
+    onStartButtonClicked: () -> Unit
 ){
     val pagerState = rememberPagerState { 3 }
     val onBoardingPages = rememberOnBoardingPages()
@@ -82,7 +80,7 @@ fun OnBoardingScreen(
                 .align(Alignment.BottomCenter)
                 .padding(24.dp),
             isVisible = { pagerState.currentPage == pagerState.pageCount - 1 },
-            onClick = {}
+            onClick = onStartButtonClicked
         )
     } 
 }
