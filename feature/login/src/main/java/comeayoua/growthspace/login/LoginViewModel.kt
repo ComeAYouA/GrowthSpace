@@ -44,12 +44,6 @@ class LoginViewModel @Inject constructor(
                     }
                 }
             }
-            is NativeSignInResult.NetworkError -> {
-                Log.d("myTag", this.message)
-            }
-            is NativeSignInResult.Error -> {
-                Log.d("myTag", this.message)
-            }
             else -> {}
         }
     }

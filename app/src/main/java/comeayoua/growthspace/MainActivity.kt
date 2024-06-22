@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -14,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import comeayoua.growthspace.navigation.AppUiState
@@ -26,7 +29,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     private val viewModel: MainViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -45,19 +47,23 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            GrowthSpaceTheme {
+            GrowthSpaceTheme(
+                dynamicColor = false
+            ) {
                 val userData by viewModel.userData.collectAsState()
 
                 Scaffold(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    containerColor = MaterialTheme.colorScheme.background
                 ) { innerPadding ->
-                  MainScreen(
-                      modifier = Modifier.padding(innerPadding),
-                      appUiState = rememberAppUiState(
-                          windowSizeClass = calculateWindowSizeClass(activity = this),
-                          userData = userData
-                      )
-                  )
+                    MainScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        appUiState = rememberAppUiState(
+                            windowSizeClass = calculateWindowSizeClass(activity = this),
+                            userData = userData
+                        )
+                    )
                 }
             }
         }

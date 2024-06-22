@@ -19,12 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,40 +38,20 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import comeayoua.growthspace.core.ui.R
+import comeayoua.growthspace.onboarding.ui.model.rememberOnBoardingPages
 
 
-@Preview
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnBoardingScreen(
     modifier: Modifier = Modifier,
-    onStartButtonClicked: () -> Unit = {}
+    onStartButtonClicked: () -> Unit
 ){
     val pagerState = rememberPagerState { 3 }
-    val pages =
-        listOf(
-            OnBoardingPageResource(
-                lead = stringResource(id = R.string.Onboarding_lead_1),
-                desc = stringResource(id = R.string.Onboarding_desc_1),
-                imgId = R.mipmap.img_onboarding_1
-            ),
-            OnBoardingPageResource(
-                lead = stringResource(id = R.string.Onboarding_lead_2),
-                desc = stringResource(id = R.string.Onboarding_desc_2),
-                imgId = R.mipmap.img_onboarding_2
-            ),
-            OnBoardingPageResource(
-                lead = stringResource(id = R.string.Onboarding_lead_3),
-                desc = stringResource(id = R.string.Onboarding_desc_3),
-                imgId = R.mipmap.img_onboarding_3
-            ),
-        )
+    val onBoardingPages = rememberOnBoardingPages()
 
     Box(
         modifier = modifier
@@ -81,60 +61,85 @@ fun OnBoardingScreen(
             state = pagerState
         ) { page ->
             OnBoardingHeader(
-                lead = pages[page].lead,
-                description = pages[page].desc,
-                imgId = pages[page].imgId
+                lead = onBoardingPages.pages[page].lead,
+                description = onBoardingPages.pages[page].desc,
+                imgId = onBoardingPages.pages[page].imgId
             )
         }
 
-        Column(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val getStartedButtonAlpha by animateFloatAsState(
-                targetValue = if (pagerState.currentPage == pagerState.pageCount - 1) 1f else 0f,
-                label = "getStartedButtonAlpha",
+
+        PagerNavigation(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 8.dp),
+            pagerState = pagerState
+        )
+
+        GoForwardButton(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(24.dp),
+            isVisible = { pagerState.currentPage == pagerState.pageCount - 1 },
+            onClick = onStartButtonClicked
+        )
+    } 
+}
+
+@Composable
+fun GoForwardButton(
+    modifier: Modifier = Modifier,
+    isVisible: () -> Boolean,
+    onClick: () -> Unit
+) {
+    val getStartedButtonAlpha by animateFloatAsState(
+        targetValue = if (isVisible.invoke()) 1f else 0f,
+        label = "getStartedButtonAlpha",
+    )
+
+    Button(
+        modifier = modifier
+            .graphicsLayer {
+                this.translationY = 100 - 100 * getStartedButtonAlpha
+                this.alpha = getStartedButtonAlpha
+            }
+            .padding(bottom = 10.dp),
+        enabled = isVisible.invoke(),
+        onClick = onClick
+    ){
+        Text(
+            modifier = Modifier.graphicsLayer {
+                this.alpha = getStartedButtonAlpha
+            },
+            text = "Get started"
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PagerNavigation(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState
+) {
+    Row(
+        modifier
+            .wrapContentHeight()
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        repeat(pagerState.pageCount) { iteration ->
+            val color by animateColorAsState(
+                targetValue = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray,
+                label = ""
             )
 
-            Button(
-                modifier = Modifier.graphicsLayer {
-                    this.translationY = 100 - 100 * getStartedButtonAlpha
-                    this.alpha = getStartedButtonAlpha
-                }
-                    .padding(bottom = 10.dp),
-                enabled = pagerState.currentPage == pagerState.pageCount - 1,
-                onClick = onStartButtonClicked
-            ){
-                Text(
-                    modifier = Modifier.graphicsLayer {
-                        this.alpha = getStartedButtonAlpha
-                    },
-                    text = "Get started"
-                )
-            }
-
-            Row(
-                Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(pagerState.pageCount) { iteration ->
-                    val color by animateColorAsState(
-                        targetValue = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray,
-                        label = ""
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                            .size(16.dp)
-                    )
-                }
-            }
+            Box(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(CircleShape)
+                    .background(color)
+                    .size(16.dp)
+            )
         }
     }
 }
@@ -158,7 +163,7 @@ fun OnBoardingHeader(
         Spacer(modifier = Modifier.fillMaxHeight(0.1f))
 
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .onGloballyPositioned {
                     headerBottom.value = with(density) {
                         (it.positionInWindow().y + it.size.height).toDp()
@@ -175,7 +180,9 @@ fun OnBoardingHeader(
                 fontSize = 32.sp,
                 lineHeight = 32.sp
             )
-            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = description,
                 fontWeight = FontWeight.Medium,
@@ -198,10 +205,3 @@ fun OnBoardingHeader(
 
     }
 }
-
-@Stable
-data class OnBoardingPageResource(
-    val lead: String,
-    val desc: String,
-    @DrawableRes val imgId: Int
-)
