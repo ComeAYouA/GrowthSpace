@@ -33,7 +33,6 @@ class AppUiState(
     val navController: NavHostController,
     private val userData: UserData,
 ) {
-
     val startDestination: String
     get() = if (userData.isUserLoggedIn) {
         "PROJECTS_ROUTE"
