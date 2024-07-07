@@ -1,5 +1,6 @@
 package comeayoua.growthspace.domain
 
+import android.util.Log
 import comeayoua.growthspace.auth.util.UserDataUtil
 import comeayoua.growthspace.model.UserData
 import io.github.jan.supabase.gotrue.Auth
@@ -12,6 +13,8 @@ class GetUserDataUseCase @Inject constructor(
     suspend operator fun invoke(): UserData {
         val isUserLoggedIn = checkLogin()
         val isOnboarded = userDataUtil.getOnBoardingStatus()
+
+        Log.d("myTag", "$isUserLoggedIn $isOnboarded")
 
         return UserData(
             isUserLoggedIn = isUserLoggedIn,

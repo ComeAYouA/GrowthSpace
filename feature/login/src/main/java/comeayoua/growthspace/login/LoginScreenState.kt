@@ -1,6 +1,6 @@
 package comeayoua.growthspace.login
 
 sealed interface LoginScreenState{
-    object Loading: LoginScreenState
-    object Success: LoginScreenState
+    object Disabled: LoginScreenState
+    object Enabled: LoginScreenState
 }
