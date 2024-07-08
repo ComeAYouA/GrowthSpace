@@ -1,6 +1,6 @@
 package comeayoua.growthspace.login.navigation
 
-import comeayoua.growthspace.login.SignInScreen
+import comeayoua.growthspace.login.ui.login.LoginScreen
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -21,7 +21,7 @@ fun NavGraphBuilder.loginScreen(
             navDeepLink { uriPattern = URI_PATTERN_LINK },
         ),
     ) {
-        SignInScreen(
+        LoginScreen(
             onLogin = onLogin
         )
     }
