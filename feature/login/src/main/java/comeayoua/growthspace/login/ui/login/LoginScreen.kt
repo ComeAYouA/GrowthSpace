@@ -1,20 +1,16 @@
 package comeayoua.growthspace.login.ui.login
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.EaseInOutQuad
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOut
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,10 +18,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,18 +33,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import comeayoua.growthspace.core.ui.R
 import comeayoua.growthspace.login.LoginScreenState
 import comeayoua.growthspace.login.LoginViewModel
 import comeayoua.growthspace.login.ui.signup.SignUpForm
@@ -63,11 +60,11 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val loginMode: MutableState<LoginMode> = remember {
-        mutableStateOf(LoginMode.SignUp)
+        mutableStateOf(LoginMode.SignIn)
     }
 
     val gradient = Brush.radialGradient(
-        0.0f to Color(168, 223, 203),
+        0.0f to MaterialTheme.colorScheme.primaryContainer,
         1f to MaterialTheme.colorScheme.background
     )
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -106,16 +103,15 @@ fun LoginScreen(
         )
 
         if (loginMode.value is LoginMode.SignUp){
-            IconButton(
-                modifier = Modifier.padding(top = 8.dp),
-                onClick = { loginMode.value = LoginMode.SignIn }
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "back to sign in"
-                )
-            }
+            Icon(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .clickable { loginMode.value = LoginMode.SignIn },
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                contentDescription = "back to sign in"
+            )
         }
 
 
@@ -123,7 +119,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
 
             Text(
-                text = "Get ready for a world for a growing spaces",
+                text = stringResource(R.string.Login_lead),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 lineHeight = 32.sp
@@ -137,8 +133,8 @@ fun LoginScreen(
 
                 this@Column.AnimatedVisibility(
                     visible = loginMode.value is LoginMode.SignIn,
-                    enter = slideInHorizontally { windowWidth * 3 },
-                    exit = slideOutHorizontally { windowWidth * 3 }
+                    enter = slideInHorizontally { -windowWidth * 3 },
+                    exit = slideOutHorizontally { -windowWidth * 3 }
                 ) {
                     SignInForm(
                         modifier = Modifier,
@@ -153,8 +149,8 @@ fun LoginScreen(
                 }
                 this@Column.AnimatedVisibility(
                     visible = loginMode.value is LoginMode.SignUp,
-                    enter = slideInHorizontally { -windowWidth * 3},
-                    exit = slideOutHorizontally { -windowWidth * 3 }
+                    enter = slideInHorizontally { windowWidth * 3},
+                    exit = slideOutHorizontally { windowWidth * 3 }
                 ) {
                     SignUpForm(
                         modifier = Modifier,

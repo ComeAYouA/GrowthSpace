@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import comeayoua.growthspace.core.ui.R
 
 @Composable
-fun SignInButton(
+fun SignInWithGoogleButton(
     onClick: () -> Unit,
     isLoading: () -> Boolean = { true }
 ){
@@ -33,7 +33,10 @@ fun SignInButton(
             .clip(RoundedCornerShape(60.dp)),
         enabled = !isLoading.invoke(),
         onClick = onClick,
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            disabledContentColor = MaterialTheme.colorScheme.surfaceContainer
+        )
     ) {
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -56,7 +59,7 @@ fun SignInButton(
                     text = "Continue with Google",
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             } else {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

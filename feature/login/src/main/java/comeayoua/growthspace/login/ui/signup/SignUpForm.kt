@@ -18,12 +18,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import comeayoua.growthspace.login.ui.CreateNewSuggestion
-import comeayoua.growthspace.login.ui.LoginDivider
+import comeayoua.growthspace.core.ui.R
+import comeayoua.growthspace.ui.widgets.CenterTextDivider
 import comeayoua.growthspace.ui.widgets.DefaultTextField
-import comeayoua.growthspace.ui.widgets.SignInButton
+import comeayoua.growthspace.ui.widgets.SignInWithGoogleButton
 
 @Preview
 @Composable
@@ -43,11 +45,19 @@ fun SignUpForm(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        DefaultTextField(hint = "Email", query = emailQueue)
+        DefaultTextField(hint = stringResource(id = R.string.Email), query = emailQueue)
         Spacer(modifier = spacerModifier)
-        DefaultTextField(hint = "Password", query = passwordQueue)
+        DefaultTextField(
+            hint = stringResource(id = R.string.Password),
+            query = passwordQueue,
+            visualTransformation = PasswordVisualTransformation()
+        )
         Spacer(modifier = spacerModifier)
-        DefaultTextField(hint = "Confirm password", query = confirmPasswordQueue)
+        DefaultTextField(
+            hint = stringResource(id = R.string.ConfirmPassword),
+            query = confirmPasswordQueue,
+            visualTransformation = PasswordVisualTransformation()
+        )
         Spacer(modifier = spacerModifier)
 
         Box(
@@ -62,16 +72,17 @@ fun SignUpForm(
             ){
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = "Sign up"
+                    text = stringResource(id = R.string.SignUp),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
 
         Spacer(modifier = spacerModifier)
-        LoginDivider()
+        CenterTextDivider(text = "or ${stringResource(id = R.string.SignUp).lowercase()}")
         Spacer(modifier = spacerModifier)
 
-        SignInButton(
+        SignInWithGoogleButton(
             onClick = signInWithGoogle,
             isLoading = isLoading
         )

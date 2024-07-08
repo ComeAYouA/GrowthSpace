@@ -17,7 +17,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -26,6 +29,7 @@ fun DefaultTextField(
     modifier: Modifier = Modifier,
     onSearchQueryChanged: (String) -> Unit = {},
     hint: String = "",
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     query: MutableState<String> = rememberSaveable { mutableStateOf("") }
 ){
     BasicTextField(
@@ -40,9 +44,12 @@ fun DefaultTextField(
             onSearchQueryChanged(it)
         },
         singleLine = true,
+        visualTransformation = visualTransformation,
         textStyle = TextStyle().copy(
-            fontSize = 16.sp
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurface
         ),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
         decorationBox = { innerTextField ->
             Box(
                 modifier = Modifier.fillMaxSize(),

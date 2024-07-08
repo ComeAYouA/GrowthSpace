@@ -18,11 +18,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.decapitalize
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import comeayoua.growthspace.core.ui.R
 import comeayoua.growthspace.login.ui.CreateNewSuggestion
-import comeayoua.growthspace.login.ui.LoginDivider
+import comeayoua.growthspace.ui.widgets.CenterTextDivider
 import comeayoua.growthspace.ui.widgets.DefaultTextField
-import comeayoua.growthspace.ui.widgets.SignInButton
+import comeayoua.growthspace.ui.widgets.SignInWithGoogleButton
+import java.util.Locale
 
 @Composable
 fun SignInForm(
@@ -41,9 +46,13 @@ fun SignInForm(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        DefaultTextField(hint = "Email", query = emailQueue)
+        DefaultTextField(hint = stringResource(id = R.string.Email), query = emailQueue,)
         Spacer(modifier = spacerModifier)
-        DefaultTextField(hint = "Password", query = passwordQueue)
+        DefaultTextField(
+            hint = stringResource(id = R.string.Password),
+            query = passwordQueue,
+            visualTransformation = PasswordVisualTransformation()
+        )
         Spacer(modifier = spacerModifier)
 
         Box(
@@ -58,16 +67,17 @@ fun SignInForm(
             ){
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = "Login"
+                    text = stringResource(id = R.string.Login),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
 
         Spacer(modifier = spacerModifier)
-        LoginDivider()
+        CenterTextDivider(text = "or ${stringResource(id = R.string.Login).lowercase()}")
         Spacer(modifier = spacerModifier)
 
-        SignInButton(
+        SignInWithGoogleButton(
             onClick = signInWithGoogle,
             isLoading = isLoading
         )
