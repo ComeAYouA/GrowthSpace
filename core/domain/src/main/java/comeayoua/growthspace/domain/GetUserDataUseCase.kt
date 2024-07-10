@@ -14,8 +14,6 @@ class GetUserDataUseCase @Inject constructor(
         val isUserLoggedIn = checkLogin()
         val isOnboarded = userDataUtil.getOnBoardingStatus()
 
-        Log.d("myTag", "$isUserLoggedIn $isOnboarded")
-
         return UserData(
             isUserLoggedIn = isUserLoggedIn,
             isOnboarded = isOnboarded

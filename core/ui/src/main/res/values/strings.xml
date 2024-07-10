@@ -9,6 +9,7 @@
     <string name="Login_lead">Get ready for a world of growing spaces</string>
     <string name="Login">Log in</string>
     <string name="SignUp">Sign up</string>
+    <string name="SignIn">Sign in</string>
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="ConfirmPassword">Confirm password</string>

@@ -1,4 +1,4 @@
-package comeayoua.growthspace.login.ui.login
+package comeayoua.growthspace.login.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutQuad
@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -48,7 +48,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import comeayoua.growthspace.core.ui.R
 import comeayoua.growthspace.login.LoginScreenState
 import comeayoua.growthspace.login.LoginViewModel
-import comeayoua.growthspace.login.ui.signup.SignUpForm
+import comeayoua.growthspace.login.ui.stateholders.FormState
+import comeayoua.growthspace.login.ui.stateholders.LoginMode
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,9 +60,16 @@ fun LoginScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
     val loginMode: MutableState<LoginMode> = remember {
         mutableStateOf(LoginMode.SignIn)
     }
+
+    LaunchedEffect(loginMode.value) {
+        viewModel.updateFormState(FormState.Valid)
+    }
+
+    val formState by viewModel.formState.collectAsState()
 
     val gradient = Brush.radialGradient(
         0.0f to MaterialTheme.colorScheme.primaryContainer,
@@ -138,13 +146,19 @@ fun LoginScreen(
                 ) {
                     SignInForm(
                         modifier = Modifier,
-                        isLoading = { uiState !is LoginScreenState.Enabled },
-                        signInWithGoogle = {
+                        isLoginning = { uiState is LoginScreenState.LoginningUp},
+                        isSyncingWithGoogle = { uiState is LoginScreenState.SyncingWithGoogle },
+                        onLogin = { email, password ->
                             coroutineScope.launch {
-                                if (viewModel.signIn(context)) onLogin()
+                                if (viewModel.signIn(email, password)) onLogin()
                             }
                         },
-                        toSignUpForm = { loginMode.value = LoginMode.SignUp }
+                        signInWithGoogle = {
+                            coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
+                        },
+                        updateForm = {formState ->  viewModel.updateFormState(formState)},
+                        toSignInForm = { loginMode.value = LoginMode.SignUp },
+                        formState = formState,
                     )
                 }
                 this@Column.AnimatedVisibility(
@@ -154,20 +168,23 @@ fun LoginScreen(
                 ) {
                     SignUpForm(
                         modifier = Modifier,
-                        isLoading = { uiState !is LoginScreenState.Enabled },
-                        signInWithGoogle = {
+                        isSigningUp = { uiState is LoginScreenState.SigningUp},
+                        isSyncingWithGoogle = { uiState is LoginScreenState.SyncingWithGoogle },
+                        onSignUp = { email, password ->
                             coroutineScope.launch {
-                                if (viewModel.signIn(context)) onLogin()
+                                if(viewModel.signUp(email, password)) onLogin()
                             }
                         },
+                        updateForm = {formState ->  viewModel.updateFormState(formState)},
+                        signInWithGoogle = {
+                            coroutineScope.launch {
+                                if (viewModel.signInWithGoogle(context)) onLogin()
+                            }
+                        },
+                        formState = formState
                     )
                 }
             }
         }
     }
-}
-
-sealed interface LoginMode{
-    object SignIn: LoginMode
-    object SignUp: LoginMode
 }

@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,10 +26,12 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun DefaultTextField(
     modifier: Modifier = Modifier,
-    onSearchQueryChanged: (String) -> Unit = {},
+    onValueChanged: (String) -> Unit = {},
+    hintColor: Color = Color.Gray,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
     hint: String = "",
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    query: MutableState<String> = rememberSaveable { mutableStateOf("") }
+    queue: MutableState<String> = rememberSaveable { mutableStateOf("") }
 ){
     BasicTextField(
         modifier = modifier
@@ -38,16 +39,17 @@ fun DefaultTextField(
             .height(42.dp)
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
-        value = query.value,
+        value = queue.value,
         onValueChange = {
-            query.value = it
-            onSearchQueryChanged(it)
+            queue.value = it
+            onValueChanged(it)
+
         },
         singleLine = true,
         visualTransformation = visualTransformation,
         textStyle = TextStyle().copy(
             fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            color = textColor
         ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
         decorationBox = { innerTextField ->
@@ -55,10 +57,10 @@ fun DefaultTextField(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.CenterStart
             ){
-                if (query.value.isEmpty()){
+                if (queue.value.isEmpty()){
                     Text(
                         text = hint,
-                        color = Color.Gray
+                        color = hintColor
                     )
                 }
                 innerTextField()

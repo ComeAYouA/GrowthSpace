@@ -1,6 +1,6 @@
 package comeayoua.growthspace.login.navigation
 
-import comeayoua.growthspace.login.ui.login.LoginScreen
+import comeayoua.growthspace.login.ui.LoginScreen
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
