@@ -2,19 +2,17 @@ package comeayoua.growthspace.domain
 
 import comeayoua.growthspace.auth.util.UserDataUtil
 import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.providers.Google
-import io.github.jan.supabase.gotrue.providers.builtin.IDToken
+import io.github.jan.supabase.gotrue.providers.builtin.Email
 import javax.inject.Inject
 
-class SignInWithGoogleUseCase @Inject constructor(
+class SignInWithEmailUseCase @Inject constructor(
     private val auth: Auth,
     private val userDataUtil: UserDataUtil
 ){
-    suspend operator fun invoke(googleIdToken: String, rawNonce: String): Boolean {
-        auth.signUpWith(IDToken) {
-            idToken = googleIdToken
-            provider = Google
-            nonce = rawNonce
+    suspend operator fun invoke(email: String, password: String): Boolean{
+        auth.signInWith(Email) {
+            this.email = email
+            this.password = password
         }
 
         saveToken()

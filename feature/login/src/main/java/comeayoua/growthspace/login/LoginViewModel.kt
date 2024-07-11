@@ -1,36 +1,28 @@
 package comeayoua.growthspace.login
 
 import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.CreateCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import comeayoua.growthspace.domain.SignInWithEmailUseCase
 import comeayoua.growthspace.domain.SignInWithGoogleUseCase
+import comeayoua.growthspace.domain.SignUpWithEmailUseCase
 import comeayoua.growthspace.login.ui.stateholders.FormState
+import comeayoua.growthspace.login.utils.handleLoginException
 import comeayoua.growthspace.login.utils.rawNonceToGoogleOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import java.text.Normalizer.Form
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val auth: Auth,
-    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
+    private val signInWithEmailUseCase: SignInWithEmailUseCase,
+    private val signUpWithEmailUseCase: SignUpWithEmailUseCase
 ): ViewModel() {
     private val _uiState: MutableStateFlow<LoginScreenState> = MutableStateFlow(LoginScreenState.Enabled)
     val uiState = _uiState.asStateFlow()
@@ -49,7 +41,7 @@ class LoginViewModel @Inject constructor(
             .addCredentialOption(googleOption)
             .build()
 
-        return try {
+        val requestValidation =  try {
             val result = credentialManager.getCredential(
                 request = request,
                 context = context
@@ -65,47 +57,35 @@ class LoginViewModel @Inject constructor(
                 rawNonce = rawNonce
             )
 
-            _uiState.update { LoginScreenState.Enabled }
-            true
-        }catch (e: NoCredentialException){
-            Toast.makeText(
-                context,
-                "Google credentials are missing",
-                Toast.LENGTH_LONG
-            ).show()
-            _uiState.update { LoginScreenState.Enabled }
-            false
-        }catch (e: GetCredentialCancellationException){
-            _uiState.update { LoginScreenState.Enabled }
-            false
-        }catch (e: CreateCredentialCancellationException){
-            false
         }catch (e: Exception){
-            Toast.makeText(
-                context,
-                "Unknown error. Please try again later/",
-                Toast.LENGTH_LONG
-            ).show()
-            _uiState.update { LoginScreenState.Enabled }
+            val error = handleLoginException(e)
+            error.message?.let{ message ->
+                _formState.value = FormState.Error(message)
+            }
+
             false
         }
+
+        _uiState.update { LoginScreenState.Enabled }
+
+        return requestValidation
     }
 
     suspend fun signIn(email: String, password: String): Boolean{
         _uiState.value = LoginScreenState.LoginningUp
 
         val correct = try {
-            auth.signInWith(Email){
-                this.email = email
-                this.password = password
-            }
+            val request = signInWithEmailUseCase(email, password)
 
-            Log.d("myTag", auth.currentUserOrNull().toString())
             _formState.value = FormState.Valid
-            auth.currentUserOrNull() != null
-        } catch (e: RestException) {
-            _formState.value = FormState.Error(e.description?:"")
 
+            request
+        } catch (e: Exception) {
+            val error = handleLoginException(e)
+
+            error.message?.let { message ->
+                _formState.value = FormState.Error(message)
+            }
             false
         }
 
@@ -114,20 +94,27 @@ class LoginViewModel @Inject constructor(
         return correct
     }
 
-    suspend fun signUp(email: String, password: String): Boolean {
+    suspend fun signUp(email: String, password: String, confirmPassword: String): Boolean {
         _uiState.value = LoginScreenState.SigningUp
 
+        if (confirmPassword != password) {
+            _formState.value = FormState.Error(message = "Passwords are not similar")
+            _uiState.value = LoginScreenState.Enabled
+            return false
+        }
+
         val correct =  try {
-            auth.signUpWith(Email){
-                this.email = email
-                this.password = password
+            val request = signUpWithEmailUseCase(email, password)
+
+            _formState.value = FormState.Valid
+
+            request
+        } catch (e: Exception) {
+            val error = handleLoginException(e)
+            error.message?.let { message ->
+                _formState.value = FormState.Error(message)
             }
 
-            Log.d("myTag", auth.currentUserOrNull().toString())
-            _formState.value = FormState.Valid
-            auth.currentUserOrNull() != null
-        } catch (e: RestException) {
-            _formState.value = FormState.Error(e.description?:e.message?.lines()?.first()?:"")
             false
         }
 

@@ -144,11 +144,10 @@ fun LoginScreen(
                     enter = slideInHorizontally { -windowWidth * 3 },
                     exit = slideOutHorizontally { -windowWidth * 3 }
                 ) {
-                    SignInForm(
-                        modifier = Modifier,
-                        isLoginning = { uiState is LoginScreenState.LoginningUp},
-                        isSyncingWithGoogle = { uiState is LoginScreenState.SyncingWithGoogle },
-                        onLogin = { email, password ->
+                    LoginForm(
+                        confirmPasswordField = false,
+                        createNewAccountLink = true,
+                        onLogin = { email, password, _ ->
                             coroutineScope.launch {
                                 if (viewModel.signIn(email, password)) onLogin()
                             }
@@ -156,8 +155,10 @@ fun LoginScreen(
                         signInWithGoogle = {
                             coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
                         },
+                        toAnotherForm = { loginMode.value = LoginMode.SignUp },
                         updateForm = {formState ->  viewModel.updateFormState(formState)},
-                        toSignInForm = { loginMode.value = LoginMode.SignUp },
+                        mainButtonIsLoading = { uiState is LoginScreenState.LoginningUp },
+                        googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
                         formState = formState,
                     )
                 }
@@ -166,21 +167,20 @@ fun LoginScreen(
                     enter = slideInHorizontally { windowWidth * 3},
                     exit = slideOutHorizontally { windowWidth * 3 }
                 ) {
-                    SignUpForm(
-                        modifier = Modifier,
-                        isSigningUp = { uiState is LoginScreenState.SigningUp},
-                        isSyncingWithGoogle = { uiState is LoginScreenState.SyncingWithGoogle },
-                        onSignUp = { email, password ->
+                    LoginForm(
+                        confirmPasswordField = true,
+                        createNewAccountLink = false,
+                        onLogin = { email, password, confirmPassword ->
                             coroutineScope.launch {
-                                if(viewModel.signUp(email, password)) onLogin()
+                                if(viewModel.signUp(email, password, confirmPassword!!)) onLogin()
                             }
+                        },
+                        signInWithGoogle = {
+                            coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
                         },
                         updateForm = {formState ->  viewModel.updateFormState(formState)},
-                        signInWithGoogle = {
-                            coroutineScope.launch {
-                                if (viewModel.signInWithGoogle(context)) onLogin()
-                            }
-                        },
+                        mainButtonIsLoading = { uiState is LoginScreenState.SigningUp },
+                        googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
                         formState = formState
                     )
                 }

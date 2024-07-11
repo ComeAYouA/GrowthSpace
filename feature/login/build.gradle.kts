@@ -28,7 +28,6 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.supabase.gotrue)
     implementation(libs.supabase.auth)
     implementation(libs.coil.compose)
     implementation(libs.androidx.credentials)
@@ -37,6 +36,7 @@ dependencies {
 
 
     implementation(project(":core:data"))
+    implementation(project(":core:model"))
     implementation(project(":core:domain"))
     implementation(project(":core:ui"))
 }

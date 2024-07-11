@@ -22,7 +22,7 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
     primary = LightGreen60,
-    onPrimary = Green80,
+    onPrimary = LightGreen30,
     secondary = LightGreen40,
     primaryContainer = LightGreen20,
     surfaceContainer = White,

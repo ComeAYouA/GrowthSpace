@@ -2,7 +2,6 @@ package comeayoua.growthspace.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import comeayoua.growthspace.login.navigation.loginScreen
 import comeayoua.growthspace.login.navigation.navigateToLoginScreen
@@ -25,7 +24,11 @@ fun GrowthSpaceNavHost(
         startDestination = startDestination
     ){
         loginScreen(
-            onLogin = { navController.navigateToProjectsScreen() }
+            onLogin = {
+                navController.navigateToProjectsScreen{
+                    popUpTo(0)
+                }
+            }
         )
         projectsScreen()
         onBoardingScreen(
