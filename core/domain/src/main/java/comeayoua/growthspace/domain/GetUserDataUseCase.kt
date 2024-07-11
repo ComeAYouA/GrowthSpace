@@ -1,5 +1,6 @@
 package comeayoua.growthspace.domain
 
+import android.util.Log
 import comeayoua.growthspace.auth.util.UserDataUtil
 import comeayoua.growthspace.model.UserData
 import io.github.jan.supabase.gotrue.Auth

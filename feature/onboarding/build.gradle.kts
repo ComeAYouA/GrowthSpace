@@ -15,5 +15,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.lifecycle.viewmodel.ktx)
 
+    implementation(project(":core:data"))
     implementation(project(":core:ui"))
 }

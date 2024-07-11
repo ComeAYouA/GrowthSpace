@@ -6,8 +6,14 @@ import androidx.compose.ui.graphics.Color
 val Purple20 = Color(0XFFCDC0EB)
 val Purple80 = Color(0XFFA175FF)
 
-val LightGreen20 = Color(0XFF66FFC8)
-val LightGreen60 = Color(0XFF629180)
+val LightGreen20 = Color(0XFFA8DFCB)
+val LightGreen30 = Color(0XFFC3FBE7)
+val LightGreen40 = Color(0XFF66FFC8)
+val LightGreen60 = Color(0XFF68B69A)
+
+val Green80 = Color(0XFF3F7562)
+
+val Blue80 = Color(0XFF517FF4)
 
 val White20 = Color(0XFFF4F4F4)
 val White = Color(0XFFFFFFFF)
