@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
-import comeayoua.growthspace.projects.Projects
+import comeayoua.growthspace.projects.ProjectsScreen
 
 const val PROJECTS_ROUTE = "projects_route"
 private const val URI_PATTERN_LINK = "https://www.comayoua.growthspace/projects"
@@ -20,6 +20,6 @@ fun NavGraphBuilder.projectsScreen() {
             navDeepLink { uriPattern = URI_PATTERN_LINK },
         ),
     ) {
-        Projects()
+        ProjectsScreen()
     }
 }

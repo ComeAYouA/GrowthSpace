@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import comeayoua.growthspace.onboarding.ui.model.rememberOnBoardingPages
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnBoardingScreen(
@@ -60,7 +59,7 @@ fun OnBoardingScreen(
             modifier = modifier,
             state = pagerState
         ) { page ->
-            OnBoardingHeader(
+            OnBoardingPage(
                 lead = onBoardingPages.pages[page].lead,
                 description = onBoardingPages.pages[page].desc,
                 imgId = onBoardingPages.pages[page].imgId
@@ -145,7 +144,7 @@ fun PagerNavigation(
 }
 
 @Composable
-fun OnBoardingHeader(
+fun OnBoardingPage(
     lead: String,
     description: String,
     @DrawableRes imgId: Int,
