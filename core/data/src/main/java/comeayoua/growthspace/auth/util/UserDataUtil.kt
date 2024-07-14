@@ -7,12 +7,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val USER_SHARED_PREF_KEY = "USER_SHARED_PREF_KEY"
 private const val TOKEN_KEY = "TOKEN_KEY"
 private const val ONBOARDING_STATUS_KEY = "ONBOARDING_STATUS_KEY"
 
 
+@Singleton
 class UserDataUtil @Inject constructor(
     @ApplicationContext private val context: Context,
 ){

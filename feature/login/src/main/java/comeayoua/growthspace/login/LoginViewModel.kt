@@ -1,50 +1,129 @@
 package comeayoua.growthspace.login
 
-import android.util.Log
+import android.content.Context
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import comeayoua.growthspace.auth.util.UserDataUtil
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import comeayoua.growthspace.domain.SignInWithEmailUseCase
+import comeayoua.growthspace.domain.SignInWithGoogleUseCase
+import comeayoua.growthspace.domain.SignUpWithEmailUseCase
+import comeayoua.growthspace.login.ui.stateholders.FormState
+import comeayoua.growthspace.login.utils.handleLoginException
+import comeayoua.growthspace.login.utils.rawNonceToGoogleOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.compose.auth.ComposeAuth
-import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
-import io.github.jan.supabase.gotrue.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    val composeAuth: ComposeAuth,
-    private val auth: Auth,
-    private val userDataUtil: UserDataUtil
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
+    private val signInWithEmailUseCase: SignInWithEmailUseCase,
+    private val signUpWithEmailUseCase: SignUpWithEmailUseCase
 ): ViewModel() {
-    private val _uiState: MutableStateFlow<LoginScreenState> = MutableStateFlow(LoginScreenState.Loading)
+    private val _uiState: MutableStateFlow<LoginScreenState> = MutableStateFlow(LoginScreenState.Enabled)
     val uiState = _uiState.asStateFlow()
 
-    private fun saveToken(){
-        val token = auth.currentAccessTokenOrNull()
+    private val _formState: MutableStateFlow<FormState> = MutableStateFlow(FormState.Valid)
+    val formState = _formState.asStateFlow()
 
-        userDataUtil.saveUserToken(token)
+    suspend fun signInWithGoogle(context: Context): Boolean{
+        _uiState.value = LoginScreenState.SyncingWithGoogle
+
+        val rawNonce = UUID.randomUUID().toString()
+        val googleOption = rawNonceToGoogleOptions(rawNonce)
+
+        val credentialManager = CredentialManager.create(context)
+        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(googleOption)
+            .build()
+
+        val requestValidation =  try {
+            val result = credentialManager.getCredential(
+                request = request,
+                context = context
+            )
+
+            val credential = result.credential
+            val googleIdTokenCredential = GoogleIdTokenCredential
+                .createFrom(credential.data)
+            val googleIdToken = googleIdTokenCredential.idToken
+
+            signInWithGoogleUseCase(
+                googleIdToken = googleIdToken,
+                rawNonce = rawNonce
+            )
+
+        }catch (e: Exception){
+            val error = handleLoginException(e)
+            error.message?.let{ message ->
+                _formState.value = FormState.Error(message)
+            }
+
+            false
+        }
+
+        _uiState.update { LoginScreenState.Enabled }
+
+        return requestValidation
     }
 
-    fun NativeSignInResult.retrieveGoogleAuth(){
-        when(this){
-            NativeSignInResult.Success -> {
-                viewModelScope.launch {
-                    _uiState.update {
-                        LoginScreenState.Loading
-                    }
+    suspend fun signIn(email: String, password: String): Boolean{
+        _uiState.value = LoginScreenState.LoginningUp
 
-                    saveToken()
+        val correct = try {
+            val request = signInWithEmailUseCase(email, password)
 
-                    _uiState.update {
-                        LoginScreenState.Success
-                    }
-                }
+            _formState.value = FormState.Valid
+
+            request
+        } catch (e: Exception) {
+            val error = handleLoginException(e)
+
+            error.message?.let { message ->
+                _formState.value = FormState.Error(message)
             }
-            else -> {}
+            false
         }
+
+        _uiState.value = LoginScreenState.Enabled
+
+        return correct
+    }
+
+    suspend fun signUp(email: String, password: String, confirmPassword: String): Boolean {
+        _uiState.value = LoginScreenState.SigningUp
+
+        if (confirmPassword != password) {
+            _formState.value = FormState.Error(message = "Passwords are not similar")
+            _uiState.value = LoginScreenState.Enabled
+            return false
+        }
+
+        val correct =  try {
+            val request = signUpWithEmailUseCase(email, password)
+
+            _formState.value = FormState.Valid
+
+            request
+        } catch (e: Exception) {
+            val error = handleLoginException(e)
+            error.message?.let { message ->
+                _formState.value = FormState.Error(message)
+            }
+
+            false
+        }
+
+        _uiState.value = LoginScreenState.Enabled
+
+        return correct
+    }
+
+    fun updateFormState(state: FormState){
+        _formState.value = state
     }
 }

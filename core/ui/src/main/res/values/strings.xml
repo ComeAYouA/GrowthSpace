@@ -6,6 +6,11 @@
     <string name="Onboarding_desc_2">Join communities and contribute to their development by adding a project to your favorites. Join the discussion via chat and find friends with similar interests</string>
     <string name="Onboarding_lead_3">Step by step towards your goal.</string>
     <string name="Onboarding_desc_3">Monitor your progress using the project tree, mark important events in milestones and receive rewards</string>
-
-
+    <string name="Login_lead">Get ready for a world of growing spaces</string>
+    <string name="Login">Log in</string>
+    <string name="SignUp">Sign up</string>
+    <string name="SignIn">Sign in</string>
+    <string name="Email">Email</string>
+    <string name="Password">Password</string>
+    <string name="ConfirmPassword">Confirm password</string>
 </resources>

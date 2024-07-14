@@ -1,5 +1,6 @@
 package comeayoua.growthspace.navigation
 
+import android.util.Log
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ fun rememberAppUiState(
     return remember(
         windowSizeClass
     ){
+        Log.d("myTag", userData.toString())
         AppUiState(
             windowSizeClass,
             navController,
@@ -34,13 +36,15 @@ class AppUiState(
     private val userData: UserData,
 ) {
     val startDestination: String
-    get() = if (userData.isUserLoggedIn) {
-        "PROJECTS_ROUTE"
-    } else {
-        if (userData.isOnboarded){
-            "LOGIN_ROUTE"
+    get() {
+        return if (userData.isUserLoggedIn) {
+            "PROJECTS_ROUTE"
         } else {
-            "ONBOARDING_ROUTE"
+            if (userData.isOnboarded){
+                "LOGIN_ROUTE"
+            } else {
+                "ONBOARDING_ROUTE"
+            }
         }
     }
 
