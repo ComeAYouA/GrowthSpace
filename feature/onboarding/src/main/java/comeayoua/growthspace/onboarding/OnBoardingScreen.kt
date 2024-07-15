@@ -23,6 +23,8 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,36 +54,40 @@ fun OnBoardingScreen(
     val pagerState = rememberPagerState { 3 }
     val onBoardingPages = rememberOnBoardingPages()
 
-    Box(
-        modifier = modifier
-    ){
-        HorizontalPager(
-            modifier = modifier,
-            state = pagerState
-        ) { page ->
-            OnBoardingPage(
-                lead = onBoardingPages.pages[page].lead,
-                description = onBoardingPages.pages[page].desc,
-                imgId = onBoardingPages.pages[page].imgId
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ){
+            HorizontalPager(
+                modifier = Modifier,
+                state = pagerState
+            ) { page ->
+                OnBoardingPage(
+                    lead = onBoardingPages.pages[page].lead,
+                    description = onBoardingPages.pages[page].desc,
+                    imgId = onBoardingPages.pages[page].imgId
+                )
+            }
+
+            PagerNavigation(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                pagerState = pagerState
+            )
+
+            GoForwardButton(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(24.dp),
+                isVisible = { pagerState.currentPage == pagerState.pageCount - 1 },
+                onClick = onStartButtonClicked
             )
         }
-
-
-        PagerNavigation(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 8.dp),
-            pagerState = pagerState
-        )
-
-        GoForwardButton(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(24.dp),
-            isVisible = { pagerState.currentPage == pagerState.pageCount - 1 },
-            onClick = onStartButtonClicked
-        )
-    } 
+    }
 }
 
 @Composable

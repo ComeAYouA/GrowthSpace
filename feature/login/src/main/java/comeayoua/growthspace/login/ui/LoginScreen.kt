@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -93,96 +94,101 @@ fun LoginScreen(
     val density = LocalDensity.current
     val windowWidth = with(density){ configuration.screenWidthDp.toDp().toPx().toInt() }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp)
-    ){
-        Spacer(
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background
+    ) {paddingValues ->
+        Box(
             modifier = Modifier
-                .graphicsLayer {
-                    scaleX = gradientAnim
-                    scaleY = gradientAnim
-                }
+                .padding(paddingValues)
                 .fillMaxSize()
-                .background(gradient)
-                .align(Alignment.Center)
-        )
-
-        if (loginMode.value is LoginMode.SignUp){
-            Icon(
+                .padding(horizontal = 16.dp)
+        ){
+            Spacer(
                 modifier = Modifier
-                    .padding(top = 16.dp)
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .clickable { loginMode.value = LoginMode.SignIn },
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = "back to sign in"
-            )
-        }
-
-
-        Column {
-            Spacer(modifier = Modifier.fillMaxHeight(0.1f))
-
-            Text(
-                text = stringResource(R.string.Login_lead),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                lineHeight = 32.sp
+                    .graphicsLayer {
+                        scaleX = gradientAnim
+                        scaleY = gradientAnim
+                    }
+                    .fillMaxSize()
+                    .background(gradient)
+                    .align(Alignment.Center)
             )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight(),
-                contentAlignment = Alignment.Center
-            ) {
+            if (loginMode.value is LoginMode.SignUp){
+                Icon(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .clickable { loginMode.value = LoginMode.SignIn },
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = "back to sign in"
+                )
+            }
 
-                this@Column.AnimatedVisibility(
-                    visible = loginMode.value is LoginMode.SignIn,
-                    enter = slideInHorizontally { -windowWidth * 3 },
-                    exit = slideOutHorizontally { -windowWidth * 3 }
+
+            Column {
+                Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+
+                Text(
+                    text = stringResource(R.string.Login_lead),
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 32.sp
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    LoginForm(
-                        confirmPasswordField = false,
-                        createNewAccountLink = true,
-                        onLogin = { email, password, _ ->
-                            coroutineScope.launch {
-                                if (viewModel.signIn(email, password)) onLogin()
-                            }
-                        },
-                        signInWithGoogle = {
-                            coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
-                        },
-                        toAnotherForm = { loginMode.value = LoginMode.SignUp },
-                        updateForm = {formState ->  viewModel.updateFormState(formState)},
-                        mainButtonIsLoading = { uiState is LoginScreenState.LoginningUp },
-                        googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
-                        formState = formState,
-                    )
-                }
-                this@Column.AnimatedVisibility(
-                    visible = loginMode.value is LoginMode.SignUp,
-                    enter = slideInHorizontally { windowWidth * 3},
-                    exit = slideOutHorizontally { windowWidth * 3 }
-                ) {
-                    LoginForm(
-                        confirmPasswordField = true,
-                        createNewAccountLink = false,
-                        onLogin = { email, password, confirmPassword ->
-                            coroutineScope.launch {
-                                if(viewModel.signUp(email, password, confirmPassword!!)) onLogin()
-                            }
-                        },
-                        signInWithGoogle = {
-                            coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
-                        },
-                        updateForm = {formState ->  viewModel.updateFormState(formState)},
-                        mainButtonIsLoading = { uiState is LoginScreenState.SigningUp },
-                        googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
-                        formState = formState
-                    )
+
+                    this@Column.AnimatedVisibility(
+                        visible = loginMode.value is LoginMode.SignIn,
+                        enter = slideInHorizontally { -windowWidth * 3 },
+                        exit = slideOutHorizontally { -windowWidth * 3 }
+                    ) {
+                        LoginForm(
+                            confirmPasswordField = false,
+                            createNewAccountLink = true,
+                            onLogin = { email, password, _ ->
+                                coroutineScope.launch {
+                                    if (viewModel.signIn(email, password)) onLogin()
+                                }
+                            },
+                            signInWithGoogle = {
+                                coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
+                            },
+                            toAnotherForm = { loginMode.value = LoginMode.SignUp },
+                            updateForm = {formState ->  viewModel.updateFormState(formState)},
+                            mainButtonIsLoading = { uiState is LoginScreenState.LoginningUp },
+                            googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
+                            formState = formState,
+                        )
+                    }
+                    this@Column.AnimatedVisibility(
+                        visible = loginMode.value is LoginMode.SignUp,
+                        enter = slideInHorizontally { windowWidth * 3},
+                        exit = slideOutHorizontally { windowWidth * 3 }
+                    ) {
+                        LoginForm(
+                            confirmPasswordField = true,
+                            createNewAccountLink = false,
+                            onLogin = { email, password, confirmPassword ->
+                                coroutineScope.launch {
+                                    if(viewModel.signUp(email, password, confirmPassword!!)) onLogin()
+                                }
+                            },
+                            signInWithGoogle = {
+                                coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
+                            },
+                            updateForm = {formState ->  viewModel.updateFormState(formState)},
+                            mainButtonIsLoading = { uiState is LoginScreenState.SigningUp },
+                            googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
+                            formState = formState
+                        )
+                    }
                 }
             }
         }
