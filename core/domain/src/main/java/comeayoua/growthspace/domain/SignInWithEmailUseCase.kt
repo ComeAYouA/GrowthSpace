@@ -1,13 +1,13 @@
 package comeayoua.growthspace.domain
 
-import comeayoua.growthspace.auth.util.UserDataUtil
+import comeayoua.growthspace.data.UserDataRepository
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import javax.inject.Inject
 
 class SignInWithEmailUseCase @Inject constructor(
     private val auth: Auth,
-    private val userDataUtil: UserDataUtil
+    private val userDataRepository: UserDataRepository
 ){
     suspend operator fun invoke(email: String, password: String): Boolean{
         auth.signInWith(Email) {
@@ -20,9 +20,9 @@ class SignInWithEmailUseCase @Inject constructor(
         return auth.currentUserOrNull() != null
     }
 
-    private fun saveToken(){
+    private suspend fun saveToken(){
         val token = auth.currentAccessTokenOrNull()
 
-        userDataUtil.saveUserToken(token)
+        token?.let { userDataRepository.saveToken(it) }
     }
 }

@@ -43,13 +43,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import comeayoua.growthspace.onboarding.ui.model.rememberOnBoardingPages
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnBoardingScreen(
     modifier: Modifier = Modifier,
-    onStartButtonClicked: () -> Unit
+    onStartButtonClicked: () -> Unit,
+    viewModel: OnBoardingViewModel = hiltViewModel()
 ){
     val pagerState = rememberPagerState { 3 }
     val onBoardingPages = rememberOnBoardingPages()
@@ -84,7 +86,10 @@ fun OnBoardingScreen(
                     .align(Alignment.BottomCenter)
                     .padding(24.dp),
                 isVisible = { pagerState.currentPage == pagerState.pageCount - 1 },
-                onClick = onStartButtonClicked
+                onClick = {
+                    viewModel.saveOnBoardingStatus()
+                    onStartButtonClicked()
+                }
             )
         }
     }

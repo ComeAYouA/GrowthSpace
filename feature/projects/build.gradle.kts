@@ -17,8 +17,8 @@ dependencies {
     implementation(libs.glide.compose)
     implementation(libs.supabase.gotrue)
     implementation(libs.supabase.auth)
+    implementation(project(":core:datastore"))
 
 
-    implementation(project(":core:data"))
     implementation(project(":core:network"))
 }

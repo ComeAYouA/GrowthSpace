@@ -1,10 +1,11 @@
 package comeayoua.growthspace.projects
 
 import android.util.Log
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -22,31 +23,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,40 +52,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Preview
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
     modifier: Modifier = Modifier,
 ) {
-    val yourListState = rememberLazyListState()
-    val followedListState = rememberLazyListState()
-
     val pagerState = rememberPagerState { 2 }
 
-    val topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val topBarState = rememberTopAppBarState()
+
+    val topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        state = topBarState
+    )
 
     val isTopBarCollapsed = remember {
         derivedStateOf {
-            topAppBarScrollBehavior.state.collapsedFraction == 1f
+            topBarState.collapsedFraction >= 0.5f
         }
     }
 
     Scaffold(
         modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+            .fillMaxSize(),
         topBar = {
             MediumTopAppBar(
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -109,7 +103,6 @@ fun ProjectsScreen(
                         onClick = { Log.d("myTag", "menu") }
                     ) {
                         Icon(
-                            modifier = Modifier.size(32.dp),
                             imageVector = Icons.Default.Menu,
                             contentDescription = "menu"
                         )
@@ -121,7 +114,6 @@ fun ProjectsScreen(
                         onClick = { Log.d("myTag", "new project") }
                     ) {
                         Icon(
-                            modifier = Modifier.size(32.dp),
                             imageVector = Icons.Default.Add,
                             contentDescription = "new project"
                         )
@@ -142,18 +134,24 @@ fun ProjectsScreen(
             ){
                 HorizontalPager(
                     state = pagerState,
+                    flingBehavior = PagerDefaults.flingBehavior(
+                        state = pagerState,
+                        snapAnimationSpec = spring(
+                            stiffness = Spring.StiffnessMedium
+                        ),
+                        snapPositionalThreshold = 0.3f
+                    )
                 ) { page ->
-                    if (page == 0){
-                        Projects(
+                    when(page){
+                        0 -> Projects(
                             modifier = Modifier.fillMaxSize(),
-                            state = yourListState,
-                            items = 10
+                            items = 10,
+                            nestedScrollConnection = topAppBarScrollBehavior.nestedScrollConnection
                         )
-                    } else {
-                        Projects(
+                        1 -> Projects(
                             modifier = Modifier.fillMaxSize(),
-                            state = followedListState,
-                            items = 11
+                            items = 11,
+                            nestedScrollConnection = topAppBarScrollBehavior.nestedScrollConnection
                         )
                     }
                 }
@@ -166,24 +164,20 @@ fun ProjectsScreen(
 @Composable
 fun Projects(
     modifier: Modifier = Modifier,
-    state: LazyListState,
-    contentPadding: PaddingValues = PaddingValues(top = 16.dp),
+    nestedScrollConnection: NestedScrollConnection,
     items: Int = 0
 ){
+
     LazyColumn(
         modifier = modifier
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .nestedScroll(nestedScrollConnection),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = contentPadding,
-        state = state
+        contentPadding = PaddingValues(top = 16.dp),
     ) {
         this.items(items){
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .height(80.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(MaterialTheme.colorScheme.primary)
+            ProjectItem(
+                title = "Tree #$it"
             )
         }
     }
@@ -283,5 +277,66 @@ fun Tabs(
             .fillMaxWidth()
             .align(Alignment.BottomCenter)
         )
+    }
+}
+
+@Composable
+fun ProjectItem(
+    modifier: Modifier = Modifier,
+    title: String = "Project",
+    streak: Int = 3,
+    daysOfWeek: List<Boolean> = (1..7).map { false }
+){
+    Column(
+        modifier = Modifier
+    ) {
+        Row{
+            Spacer(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+            ){
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(top = 8.dp),
+                    text = "$streak days streak",
+                    color = Color.Gray
+                )
+
+                Row(
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    daysOfWeek.forEach{
+                        Spacer(
+                            modifier = Modifier
+                                .padding(end = 4.dp)
+                                .size(15.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(
+                                    if (it)
+                                        MaterialTheme.colorScheme.inversePrimary
+                                    else
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                )
+
+                        )
+                    }
+                }
+            }
+        }
+        HorizontalDivider(modifier = Modifier.padding(start = 70.dp, top = 8.dp))
     }
 }

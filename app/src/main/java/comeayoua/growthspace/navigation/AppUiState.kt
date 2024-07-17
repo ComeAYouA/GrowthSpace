@@ -1,6 +1,5 @@
 package comeayoua.growthspace.navigation
 
-import android.util.Log
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -20,7 +19,6 @@ fun rememberAppUiState(
     return remember(
         windowSizeClass
     ){
-        Log.d("myTag", userData.toString())
         AppUiState(
             windowSizeClass,
             navController,

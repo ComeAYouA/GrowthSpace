@@ -1,38 +1,29 @@
 package comeayoua.growthspace.domain
 
-import android.util.Log
-import comeayoua.growthspace.auth.util.UserDataUtil
+import comeayoua.growthspace.data.UserDataRepository
 import comeayoua.growthspace.model.UserData
 import io.github.jan.supabase.gotrue.Auth
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class GetUserDataUseCase @Inject constructor(
-    private val auth: Auth,
-    private val userDataUtil: UserDataUtil
+    private val userDataRepository: UserDataRepository
 ){
-    suspend operator fun invoke(): UserData {
-        val isUserLoggedIn = checkLogin()
-        val isOnboarded = userDataUtil.getOnBoardingStatus()
+    operator fun invoke(): Flow<UserData> {
+        val getTokenFlow = userDataRepository.getToken()
+        val onBoardingFlow = userDataRepository.getOnBoardingStatus()
 
-        return UserData(
-            isUserLoggedIn = isUserLoggedIn,
-            isOnboarded = isOnboarded
-        )
-    }
+        return combine(
+            getTokenFlow,
+            onBoardingFlow
+        ){ token, isOnBoarded ->
+            val isLoggedIn = token != null
 
-    private suspend fun checkLogin(): Boolean =
-        try {
-            val token = userDataUtil.getUserToken()
-
-            if(token.isNullOrEmpty()) {
-                false
-            } else {
-                auth.retrieveUser(token)
-                auth.refreshCurrentSession()
-                userDataUtil.saveUserToken(token)
-                true
-            }
-        } catch (e: Exception) {
-            false
+            UserData(
+                isUserLoggedIn = isLoggedIn,
+                isOnboarded = isOnBoarded
+            )
         }
+    }
 }

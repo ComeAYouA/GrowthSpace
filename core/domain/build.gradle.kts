@@ -13,8 +13,8 @@ android {
 dependencies {
     implementation(libs.supabase.gotrue)
     implementation(libs.supabase.auth)
-
     implementation(project(":core:data"))
+
     implementation(project(":core:network"))
     implementation(project(":core:model"))
 }

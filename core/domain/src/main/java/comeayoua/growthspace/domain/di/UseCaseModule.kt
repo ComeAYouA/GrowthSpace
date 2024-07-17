@@ -7,4 +7,4 @@ import dagger.hilt.components.SingletonComponent
 
 @InstallIn(SingletonComponent::class)
 @Module
-interface UseCaseModel
+interface UseCaseModule
