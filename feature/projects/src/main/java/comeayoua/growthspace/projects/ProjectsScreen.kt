@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
 @Preview
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProjectsScreen(
     modifier: Modifier = Modifier,
+    viewModel: ProjectsViewModel = hiltViewModel()
 ) {
     val pagerState = rememberPagerState { 2 }
 
@@ -111,7 +113,7 @@ fun ProjectsScreen(
                 actions = {
                     IconButton(
                         modifier = Modifier,
-                        onClick = { Log.d("myTag", "new project") }
+                        onClick = { viewModel.addProject() }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,

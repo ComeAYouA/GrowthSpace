@@ -48,7 +48,7 @@ import comeayoua.growthspace.onboarding.ui.model.rememberOnBoardingPages
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OnBoardingScreen(
+internal fun OnBoardingScreen(
     modifier: Modifier = Modifier,
     onStartButtonClicked: () -> Unit,
     viewModel: OnBoardingViewModel = hiltViewModel()
@@ -96,7 +96,7 @@ fun OnBoardingScreen(
 }
 
 @Composable
-fun GoForwardButton(
+internal fun GoForwardButton(
     modifier: Modifier = Modifier,
     isVisible: () -> Boolean,
     onClick: () -> Unit
@@ -127,7 +127,7 @@ fun GoForwardButton(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PagerNavigation(
+internal fun PagerNavigation(
     modifier: Modifier = Modifier,
     pagerState: PagerState
 ) {
@@ -155,7 +155,7 @@ fun PagerNavigation(
 }
 
 @Composable
-fun OnBoardingPage(
+internal fun OnBoardingPage(
     lead: String,
     description: String,
     @DrawableRes imgId: Int,

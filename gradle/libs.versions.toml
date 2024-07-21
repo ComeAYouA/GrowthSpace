@@ -7,6 +7,7 @@ googleIdentity = "1.1.1"
 gradle = "8.2.2"
 hilt = "2.44"
 
+kotlinxDatetimeVersion = "0.3.2"
 supabase_version="2.4.2"
 ktor_version="2.3.11"
 
@@ -42,6 +43,9 @@ espresso-core = "3.5.1"
 appcompat = "1.6.1"
 material = "1.11.0"
 lifecycleViewModel = "2.7.0"
+workRuntimeKtx = "2.9.0"
+hiltCommon = "1.2.0"
+hiltWork = "1.2.0"
 
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastorePreferences" }
@@ -49,6 +53,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 gradle-build-tools = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
+jetbrains-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -95,6 +100,9 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "material3WindowSizeClass" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltCommon" }
+androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
 
 [plugins]
 androidApplication = {id = "com.android.application", version.ref = "agp"}

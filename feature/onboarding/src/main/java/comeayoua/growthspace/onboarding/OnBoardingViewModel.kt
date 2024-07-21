@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OnBoardingViewModel @Inject constructor(
+internal class OnBoardingViewModel @Inject constructor(
     private val setOnBoardingStatusUseCase: SetOnBoardingStatusUseCase
 ): ViewModel() {
     fun saveOnBoardingStatus(){

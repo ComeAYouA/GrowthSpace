@@ -7,6 +7,7 @@ plugins {
     id("growth-space.android.library")
     id("growth-space.android.hilt")
     id("growth-space.android.ktor")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -29,4 +30,12 @@ dependencies {
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.storage)
     implementation(libs.supabase.auth)
+
+    implementation(libs.jetbrains.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(project(":core:model"))
+    implementation(project(":core:util"))
+    implementation(project(":core:datastore"))
+
 }

@@ -4,7 +4,9 @@ import comeayoua.growthspace.data.UserDataRepository
 import comeayoua.growthspace.datastore.UserDataStore
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class UserDataRepositoryImpl @Inject constructor(
     private val userDataStore: UserDataStore
 ): UserDataRepository {

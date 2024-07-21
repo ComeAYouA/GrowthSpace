@@ -7,12 +7,12 @@ import androidx.compose.ui.res.stringResource
 import comeayoua.growthspace.core.ui.R
 
 @Immutable
-data class OnBoardingPages(
+internal data class OnBoardingPages(
     val pages: List<OnBoardingPageResource>
 )
 
 @Composable
-fun rememberOnBoardingPages(): OnBoardingPages = OnBoardingPages(
+internal fun rememberOnBoardingPages(): OnBoardingPages = OnBoardingPages(
     listOf(
         OnBoardingPageResource(
             lead = stringResource(id = R.string.Onboarding_lead_1),

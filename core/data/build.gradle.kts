@@ -8,5 +8,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:model"))
     implementation(project(":core:datastore"))
+    implementation(project(":core:database"))
+    implementation(project(":core:network"))
+    implementation(project(":sync"))
+
+    implementation(libs.androidx.work.runtime.ktx)
 }
