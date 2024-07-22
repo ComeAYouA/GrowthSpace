@@ -5,11 +5,12 @@ import androidx.room.PrimaryKey
 import comeayoua.growthspace.model.Project
 import comeayoua.growthspace.model.ProjectType
 import kotlinx.datetime.LocalDateTime
-import java.util.Date
 import java.util.UUID
 
 @Entity
 data class ProjectEntity(
+    @PrimaryKey
+    val key: UUID = UUID.randomUUID(),
     var id: Int,
     val name: String,
     val description: String,
@@ -20,10 +21,7 @@ data class ProjectEntity(
     val ownerId: UUID,
     val streak: Int,
     val daysOfWeek: List<Boolean>
-){
-    @PrimaryKey(autoGenerate = true)
-    var key: Int = 0
-}
+)
 
 fun ProjectEntity.asExternalModel(): Project
     = Project(

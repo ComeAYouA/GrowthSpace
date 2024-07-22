@@ -25,6 +25,8 @@ class SignInWithGoogleUseCase @Inject constructor(
     private suspend fun saveToken(){
         val token = auth.currentAccessTokenOrNull()
 
-        token?.let { userDataRepository.saveToken(it) }
+        token?.let {
+            userDataRepository.saveToken(it)
+        }
     }
 }

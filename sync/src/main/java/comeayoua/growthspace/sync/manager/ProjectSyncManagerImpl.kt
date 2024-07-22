@@ -1,4 +1,4 @@
-package comeayoua.growthspace.sync.source
+package comeayoua.growthspace.sync.manager
 
 import android.content.Context
 import androidx.work.ExistingWorkPolicy
@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 import javax.inject.Inject
 
 internal const val PROJECTS_SYNC_WORK_NAME = "ProjectSyncWorkName"
@@ -23,12 +24,12 @@ class ProjectSyncManagerImpl @Inject constructor(
             .map(List<WorkInfo>::anyRunning)
             .conflate()
 
-    override fun enqueueAddProjectSync(keys: List<Int>){
+    override fun enqueueAddProjectsSync(keys: List<UUID>){
         val workManager = WorkManager.getInstance(context)
 
         workManager.enqueueUniqueWork(
             PROJECTS_SYNC_WORK_NAME,
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.APPEND_OR_REPLACE,
             AddProjectSync.syncProjectsInsert(keys),
         )
     }

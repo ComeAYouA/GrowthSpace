@@ -39,9 +39,9 @@ class OfflineFirstProjectsRepository @Inject constructor(
     override suspend fun addProject(project: Project) {
         project.toInternalModel().let { entity ->
             projectsDataBase.addProject(entity)
-            Log.d("myTag", "project added to database")
+            Log.d("myTag", "project added to database: $entity, key: ${entity.key}")
 
-            projectSyncManager.enqueueAddProjectSync(listOf(entity.key))
+            projectSyncManager.enqueueAddProjectsSync(listOf(entity.key))
         }
     }
 

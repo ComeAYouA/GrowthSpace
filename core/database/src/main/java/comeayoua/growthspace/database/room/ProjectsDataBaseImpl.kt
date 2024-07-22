@@ -1,9 +1,8 @@
 package comeayoua.growthspace.database.room
 
-import android.util.Log
 import comeayoua.growthspace.database.ProjectsDao
 import comeayoua.growthspace.database.model.ProjectEntity
-import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,7 +18,7 @@ class ProjectsDataBaseImpl @Inject constructor(
 
     override fun getProjectsByIds(ids: List<Int>) = dao.getProjectsByIds(ids)
 
-    override fun getProjectsByKeys(keys: List<Int>) = dao.getProjectsByKeys(keys)
+    override fun getProjectsByKeys(keys: List<UUID>) = dao.getProjectsByKeys(keys)
 
     override suspend fun updateProject(projects: ProjectEntity) = dao.updateProject(projects)
 

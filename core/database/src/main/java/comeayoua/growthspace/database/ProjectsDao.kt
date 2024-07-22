@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Update
 import comeayoua.growthspace.database.model.ProjectEntity
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 @Dao
 interface ProjectsDao {
@@ -16,7 +17,7 @@ interface ProjectsDao {
     @Query("SELECT * FROM projectentity WHERE id IN (:ids)")
     fun getProjectsByIds(ids: List<Int>): Flow<List<ProjectEntity>>
     @Query("SELECT * FROM projectentity WHERE `key` IN (:keys)")
-    fun getProjectsByKeys(keys: List<Int>): Flow<List<ProjectEntity>>
+    fun getProjectsByKeys(keys: List<UUID>): Flow<List<ProjectEntity>>
     @Update
     suspend fun updateProject(projects: ProjectEntity)
     @Insert

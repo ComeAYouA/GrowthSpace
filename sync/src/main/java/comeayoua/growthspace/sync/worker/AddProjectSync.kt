@@ -3,13 +3,10 @@ package comeayoua.growthspace.sync.worker
 import android.content.Context
 import android.util.Log
 import androidx.hilt.work.HiltWorker
-import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
-import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
 import comeayoua.growthspace.database.ProjectsDao
 import comeayoua.growthspace.database.model.asExternalModel
@@ -18,21 +15,23 @@ import comeayoua.growthspace.network.model.toNetworkResource
 import comeayoua.growthspace.sync.util.networkConnectionConstraints
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
-import java.time.Duration
+import java.util.UUID
 
 @HiltWorker
 class AddProjectSync @AssistedInject constructor(
-    @Assisted private val context: Context,
+    @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val projectsDao: ProjectsDao,
-    private val projectsApi: ProjectsApi
+    @Assisted private val projectsDao: ProjectsDao,
+    @Assisted private val projectsApi: ProjectsApi
 ): CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         Log.d("myTag", "syncing...")
         return try {
-            val insertedEntitiesKeys = inputData.getIntArray(SYNC_IDS_KEY)?.toList()
+            val insertedEntitiesKeys = inputData.getStringArray(SYNC_IDS_KEY)?.map { key ->
+                UUID.fromString(key)
+            }
+            Log.d("myTag", "$insertedEntitiesKeys")
             insertedEntitiesKeys?.let { keys ->
                 val entities = projectsDao.getProjectsByKeys(keys).first()
 
@@ -40,6 +39,9 @@ class AddProjectSync @AssistedInject constructor(
                     val insertedProject = projectsApi.insertProject(
                         entity.asExternalModel().toNetworkResource()
                     )
+
+                    Log.d("myTag", "project inserted: $insertedProject")
+
 
                     entity.id = insertedProject.id
 
@@ -57,16 +59,20 @@ class AddProjectSync @AssistedInject constructor(
     companion object {
         private const val SYNC_IDS_KEY = "SyncIdsKey"
 
-        fun syncProjectsInsert(keys: List<Int>?): OneTimeWorkRequest {
+        fun syncProjectsInsert(keys: List<UUID>?): OneTimeWorkRequest {
             val inputData = AddProjectSync::class.inputData()
                 .apply {
-                    if (keys != null) putIntArray(SYNC_IDS_KEY, keys.toIntArray())
+                    if (keys != null) putStringArray(
+                        SYNC_IDS_KEY,
+                        keys.map { it.toString() }
+                            .toTypedArray()
+                    )
                 }
                 .build()
 
             Log.d("myTag", "oneTime worker")
 
-            return OneTimeWorkRequestBuilder<DelegatingWorker>()
+            return OneTimeWorkRequestBuilder<AddProjectSync>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setConstraints(networkConnectionConstraints)
                 .setInputData(inputData)
