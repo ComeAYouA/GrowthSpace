@@ -13,5 +13,5 @@ data class Project(
     val progress: Int,
     val ownerId: UUID,
     val streak: Int,
-    val daysOfWeek: List<Boolean>
+    val projectSchedule: ProjectSchedule
 )

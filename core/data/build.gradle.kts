@@ -14,5 +14,5 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":sync"))
 
-    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.work.ktx)
 }

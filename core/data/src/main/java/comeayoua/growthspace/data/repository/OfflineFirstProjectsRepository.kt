@@ -1,11 +1,10 @@
 package comeayoua.growthspace.data.repository
 
-import android.util.Log
 import comeayoua.growthspace.data.ProjectsRepository
 import comeayoua.growthspace.database.ProjectsDao
 import comeayoua.growthspace.database.model.ProjectEntity
+import comeayoua.growthspace.database.model.asEntity
 import comeayoua.growthspace.database.model.asExternalModel
-import comeayoua.growthspace.database.model.toInternalModel
 import comeayoua.growthspace.model.Project
 import comeayoua.growthspace.sync.ProjectSyncManager
 import kotlinx.coroutines.flow.Flow
@@ -37,15 +36,14 @@ class OfflineFirstProjectsRepository @Inject constructor(
     }
 
     override suspend fun addProject(project: Project) {
-        project.toInternalModel().let { entity ->
+        project.asEntity().let { entity ->
             projectsDataBase.addProject(entity)
-            Log.d("myTag", "project added to database: $entity, key: ${entity.key}")
 
             projectSyncManager.enqueueAddProjectsSync(listOf(entity.key))
         }
     }
 
     override suspend fun updateProject(project: Project) {
-        projectsDataBase.updateProject(project.toInternalModel())
+        projectsDataBase.updateProject(project.asEntity())
     }
 }

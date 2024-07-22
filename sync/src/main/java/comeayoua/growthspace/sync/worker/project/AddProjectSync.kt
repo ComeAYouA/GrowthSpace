@@ -1,4 +1,4 @@
-package comeayoua.growthspace.sync.worker
+package comeayoua.growthspace.sync.worker.project
 
 import android.content.Context
 import android.util.Log
@@ -13,6 +13,8 @@ import comeayoua.growthspace.database.model.asExternalModel
 import comeayoua.growthspace.network.ProjectsApi
 import comeayoua.growthspace.network.model.toNetworkResource
 import comeayoua.growthspace.sync.util.networkConnectionConstraints
+import comeayoua.growthspace.sync.worker.DelegatingWorker
+import comeayoua.growthspace.sync.worker.inputData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -22,16 +24,17 @@ import java.util.UUID
 class AddProjectSync @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    @Assisted private val projectsDao: ProjectsDao,
-    @Assisted private val projectsApi: ProjectsApi
+    private val projectsDao: ProjectsDao,
+    private val projectsApi: ProjectsApi
 ): CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
-        Log.d("myTag", "syncing...")
         return try {
             val insertedEntitiesKeys = inputData.getStringArray(SYNC_IDS_KEY)?.map { key ->
                 UUID.fromString(key)
             }
             Log.d("myTag", "$insertedEntitiesKeys")
+
+
             insertedEntitiesKeys?.let { keys ->
                 val entities = projectsDao.getProjectsByKeys(keys).first()
 
@@ -40,19 +43,15 @@ class AddProjectSync @AssistedInject constructor(
                         entity.asExternalModel().toNetworkResource()
                     )
 
-                    Log.d("myTag", "project inserted: $insertedProject")
-
-
                     entity.id = insertedProject.id
 
                     projectsDao.updateProject(entity)
                 }
             }
-            Log.d("myTag", "success")
             Result.success()
         }catch (e: Exception){
-            Log.d("myTag", "error: $e")
-            Result.retry()
+            Log.d("myTag", "$e")
+            Result.retry( )
         }
     }
 
@@ -72,7 +71,7 @@ class AddProjectSync @AssistedInject constructor(
 
             Log.d("myTag", "oneTime worker")
 
-            return OneTimeWorkRequestBuilder<AddProjectSync>()
+            return OneTimeWorkRequestBuilder<DelegatingWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setConstraints(networkConnectionConstraints)
                 .setInputData(inputData)

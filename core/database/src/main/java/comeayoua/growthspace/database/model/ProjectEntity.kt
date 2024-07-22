@@ -3,6 +3,7 @@ package comeayoua.growthspace.database.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import comeayoua.growthspace.model.Project
+import comeayoua.growthspace.model.ProjectSchedule
 import comeayoua.growthspace.model.ProjectType
 import kotlinx.datetime.LocalDateTime
 import java.util.UUID
@@ -20,7 +21,7 @@ data class ProjectEntity(
     val progress: Int,
     val ownerId: UUID,
     val streak: Int,
-    val daysOfWeek: List<Boolean>
+    val daysOfWeek: ProjectSchedule
 )
 
 fun ProjectEntity.asExternalModel(): Project
@@ -34,10 +35,10 @@ fun ProjectEntity.asExternalModel(): Project
         progress = this.progress,
         ownerId = this.ownerId,
         streak = this.streak,
-        daysOfWeek = this.daysOfWeek
+        projectSchedule = this.daysOfWeek
     )
 
-fun Project.toInternalModel(): ProjectEntity
+fun Project.asEntity(): ProjectEntity
     = ProjectEntity(
         id = this.id,
         name = this.name,
@@ -48,5 +49,5 @@ fun Project.toInternalModel(): ProjectEntity
         progress = this.progress,
         ownerId = this.ownerId,
         streak = this.streak,
-        daysOfWeek = this.daysOfWeek
+        daysOfWeek = this.projectSchedule
     )

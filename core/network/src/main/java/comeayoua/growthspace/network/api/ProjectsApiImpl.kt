@@ -1,6 +1,5 @@
 package comeayoua.growthspace.network.api
 
-import android.util.Log
 import comeayoua.growthspace.network.ProjectsApi
 import comeayoua.growthspace.network.model.ProjectNetwork
 import comeayoua.growthspace.network.model.ProjectNetworkExpanded
@@ -18,9 +17,7 @@ class ProjectsApiImpl @Inject constructor(
         = supabase.from("projects").select().decodeList()
 
     override suspend fun insertProject(project: ProjectNetwork): ProjectNetworkExpanded {
-        Log.d("myTag", "project need to insert: $project")
-
-        val userId = auth.sessionManager.loadSession()?.user?.id
+        val userId = auth.currentUserOrNull()!!.id
 
         return supabase.from("projects")
             .insert(

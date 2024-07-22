@@ -1,39 +1,32 @@
 package comeayoua.growthspace.projects
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import comeayoua.growthspace.domain.project.AddProjectsUseCase
+import comeayoua.growthspace.domain.project.AddProjectUseCase
 import comeayoua.growthspace.domain.project.GetProjectsUseCase
 import comeayoua.growthspace.model.Project
+import comeayoua.growthspace.model.ProjectSchedule
 import comeayoua.growthspace.model.ProjectType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
-import java.util.Calendar
-import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class ProjectsViewModel @Inject constructor(
     private val getProjectsUseCase: GetProjectsUseCase,
-    private val addProjectUseCase: AddProjectsUseCase
+    private val addProjectUseCase: AddProjectUseCase
 
 ): ViewModel() {
     init {
         viewModelScope.launch {
-            getProjectsUseCase().collect{
-                Log.d("myTag", "project collected: $it")
-            }
+            getProjectsUseCase().collect{}
         }
     }
 
     fun addProject(){
         viewModelScope.launch {
-            Log.d("myTag", "adding project...")
             addProjectUseCase(
                 Project(
                     0,
@@ -45,7 +38,7 @@ class ProjectsViewModel @Inject constructor(
                     0,
                     UUID.randomUUID(),
                     0,
-                    listOf()
+                    ProjectSchedule(thursday = true)
                 )
             )
         }

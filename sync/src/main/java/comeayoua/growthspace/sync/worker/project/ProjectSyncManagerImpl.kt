@@ -1,4 +1,4 @@
-package comeayoua.growthspace.sync.manager
+package comeayoua.growthspace.sync.worker.project
 
 import android.content.Context
 import androidx.work.ExistingWorkPolicy
@@ -6,7 +6,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import comeayoua.growthspace.sync.ProjectSyncManager
 import comeayoua.growthspace.sync.util.anyRunning
-import comeayoua.growthspace.sync.worker.AddProjectSync
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate

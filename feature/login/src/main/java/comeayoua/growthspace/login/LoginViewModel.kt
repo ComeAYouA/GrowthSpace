@@ -5,9 +5,9 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import comeayoua.growthspace.domain.SignInWithEmailUseCase
-import comeayoua.growthspace.domain.SignInWithGoogleUseCase
-import comeayoua.growthspace.domain.SignUpWithEmailUseCase
+import comeayoua.growthspace.domain.login.SignInWithEmailUseCase
+import comeayoua.growthspace.domain.login.SignInWithGoogleUseCase
+import comeayoua.growthspace.domain.login.SignUpWithEmailUseCase
 import comeayoua.growthspace.login.ui.stateholders.FormState
 import comeayoua.growthspace.login.utils.handleLoginException
 import comeayoua.growthspace.login.utils.rawNonceToGoogleOptions

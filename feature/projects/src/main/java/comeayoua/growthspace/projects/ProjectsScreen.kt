@@ -1,11 +1,13 @@
 package comeayoua.growthspace.projects
 
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -32,7 +34,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,20 +48,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import comeayoua.growthspace.core.ui.R
+import comeayoua.growthspace.model.ProjectSchedule
 import kotlinx.coroutines.launch
 
 @Preview
@@ -80,7 +83,7 @@ fun ProjectsScreen(
 
     val isTopBarCollapsed = remember {
         derivedStateOf {
-            topBarState.collapsedFraction >= 0.5f
+            topBarState.collapsedFraction >= 0.9f
         }
     }
 
@@ -90,7 +93,7 @@ fun ProjectsScreen(
         topBar = {
             MediumTopAppBar(
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    scrolledContainerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceBright,
                     containerColor = MaterialTheme.colorScheme.background
                 ),
                 title = {
@@ -198,6 +201,13 @@ fun Tabs(
         targetValue = if (divider()) 1f else 0f,
         label = "divider anim"
     )
+    val backgroundColor by animateColorAsState(
+        targetValue = if (divider())
+            MaterialTheme.colorScheme.surfaceBright
+        else
+            MaterialTheme.colorScheme.background,
+        label = "divider anim"
+    )
 
     val currentTab = remember {
         derivedStateOf {
@@ -223,6 +233,10 @@ fun Tabs(
 
     Box(
         modifier = modifier
+            .drawWithContent {
+                this.drawRect(backgroundColor)
+                this.drawContent()
+            }
     ) {
         Spacer(
             modifier = Modifier
@@ -272,32 +286,50 @@ fun Tabs(
                 color = if (currentTab.value == 2) MaterialTheme.colorScheme.onBackground else Color.Gray
             )
         }
-        HorizontalDivider(modifier = Modifier
-            .graphicsLayer {
-                alpha = dividerAnim.value
-            }
-            .fillMaxWidth()
-            .align(Alignment.BottomCenter)
-        )
+//        HorizontalDivider(modifier = Modifier
+//            .graphicsLayer {
+//                alpha = dividerAnim.value
+//            }
+//            .fillMaxWidth()
+//            .align(Alignment.BottomCenter)
+//        )
     }
 }
 
+@Preview
 @Composable
 fun ProjectItem(
     modifier: Modifier = Modifier,
     title: String = "Project",
     streak: Int = 3,
-    daysOfWeek: List<Boolean> = (1..7).map { false }
+    schedule: ProjectSchedule = ProjectSchedule(
+        thursday = true, sunday = true
+    )
 ){
+    val daysOfWeek = remember {
+        listOf(
+            schedule.monday,
+            schedule.tuesday,
+            schedule.wednesday,
+            schedule.thursday,
+            schedule.friday,
+            schedule.saturday,
+            schedule.sunday,
+        )
+    }
     Column(
         modifier = Modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(8.dp)
     ) {
         Row{
-            Spacer(
+            Image(
+                painter = painterResource(id = R.mipmap.img_tree_test),
                 modifier = Modifier
                     .size(60.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(MaterialTheme.colorScheme.primary)
+                    .clip(RoundedCornerShape(18.dp)),
+                contentDescription = "Image of a tree"
             )
 
             Column(
@@ -331,7 +363,7 @@ fun ProjectItem(
                                     if (it)
                                         MaterialTheme.colorScheme.inversePrimary
                                     else
-                                        MaterialTheme.colorScheme.surfaceVariant
+                                        MaterialTheme.colorScheme.surfaceDim
                                 )
 
                         )
@@ -339,6 +371,5 @@ fun ProjectItem(
                 }
             }
         }
-        HorizontalDivider(modifier = Modifier.padding(start = 70.dp, top = 8.dp))
     }
 }

@@ -1,7 +1,9 @@
 package comeayoua.growthspace.network.model
 
 import comeayoua.growthspace.model.Project
+import comeayoua.growthspace.model.ProjectSchedule
 import comeayoua.growthspace.model.ProjectType
+import comeayoua.growthspace.util.ProjectScheduleSerializer
 import comeayoua.growthspace.util.ProjectTypeSerializer
 import comeayoua.growthspace.util.UUIDSerializer
 import kotlinx.datetime.LocalDateTime
@@ -29,6 +31,9 @@ data class ProjectNetwork(
     val ownerId: UUID,
     @SerialName("streak")
     val streak: Int,
+    @SerialName("project_schedule")
+    @Serializable(with = ProjectScheduleSerializer::class)
+    val projectSchedule: ProjectSchedule
 )
 
 fun ProjectNetwork.asExternalModel(id: Int): Project =
@@ -42,7 +47,7 @@ fun ProjectNetwork.asExternalModel(id: Int): Project =
         progress = progress,
         ownerId = ownerId,
         streak = streak,
-        daysOfWeek = listOf()
+        projectSchedule = projectSchedule
     )
 
 fun Project.toNetworkResource(): ProjectNetwork =
@@ -55,4 +60,5 @@ fun Project.toNetworkResource(): ProjectNetwork =
         progress = progress,
         ownerId = ownerId,
         streak = streak,
+        projectSchedule = projectSchedule
     )

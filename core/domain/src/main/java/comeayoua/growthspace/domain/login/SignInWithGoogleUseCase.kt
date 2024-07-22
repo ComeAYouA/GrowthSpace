@@ -1,4 +1,4 @@
-package comeayoua.growthspace.domain
+package comeayoua.growthspace.domain.login
 
 import comeayoua.growthspace.data.UserDataRepository
 import io.github.jan.supabase.gotrue.Auth

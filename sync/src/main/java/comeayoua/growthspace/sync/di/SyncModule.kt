@@ -1,7 +1,7 @@
 package comeayoua.growthspace.sync.di
 
 import comeayoua.growthspace.sync.ProjectSyncManager
-import comeayoua.growthspace.sync.manager.ProjectSyncManagerImpl
+import comeayoua.growthspace.sync.worker.project.ProjectSyncManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

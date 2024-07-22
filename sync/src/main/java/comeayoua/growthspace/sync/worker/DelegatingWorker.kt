@@ -10,11 +10,13 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface HiltWorkerFactoryEntryPoint {
+    @Singleton
     fun hiltWorkerFactory(): HiltWorkerFactory
 }
 
@@ -22,7 +24,7 @@ const val WORKER_CLASS_NAME = "WorkerClassName"
 
 internal fun KClass<out CoroutineWorker>.inputData() =
     Data.Builder()
-        .putString(WORKER_CLASS_NAME, qualifiedName)
+        .putString(WORKER_CLASS_NAME, this.qualifiedName)
 
 class DelegatingWorker(
     appContext: Context,
@@ -35,8 +37,7 @@ class DelegatingWorker(
     private val delegateWorker =
         EntryPointAccessors.fromApplication<HiltWorkerFactoryEntryPoint>(appContext)
             .hiltWorkerFactory()
-            .createWorker(appContext, workerClassName, workerParams)
-                as? CoroutineWorker
+            .createWorker(appContext, workerClassName, workerParams) as? CoroutineWorker
             ?: throw IllegalArgumentException("Unable to find appropriate worker")
 
     override suspend fun getForegroundInfo(): ForegroundInfo =
