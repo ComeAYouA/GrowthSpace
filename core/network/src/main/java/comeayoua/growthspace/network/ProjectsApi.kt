@@ -1,9 +1,14 @@
 package comeayoua.growthspace.network
 
 import comeayoua.growthspace.network.model.ProjectNetwork
-import comeayoua.growthspace.network.model.ProjectNetworkExpanded
+import comeayoua.growthspace.network.model.ProjectNetworkVersioned
 
 interface ProjectsApi {
-    suspend fun getProject(): List<ProjectNetworkExpanded>
-    suspend fun insertProject(project: ProjectNetwork): ProjectNetworkExpanded
+    suspend fun getProjects(): List<ProjectNetwork>
+    suspend fun getUpdates(version: Int): List<ProjectNetworkVersioned>
+    suspend fun insertProjects(
+        projects: List<ProjectNetwork>,
+        commitVersion: Int
+    ): List<ProjectNetwork>
+    suspend fun updateProjects(projects: List<ProjectNetwork>, commitVersion: Int)
 }

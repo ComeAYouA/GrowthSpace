@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation(project(":core:database"))
     implementation(project(":core:network"))
-    implementation(project(":sync"))
 
     implementation(libs.androidx.work.ktx)
 }

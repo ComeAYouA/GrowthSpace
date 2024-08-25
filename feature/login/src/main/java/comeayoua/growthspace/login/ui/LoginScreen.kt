@@ -1,14 +1,14 @@
 package comeayoua.growthspace.login.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutQuad
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,29 +18,33 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,28 +53,58 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import comeayoua.growthspace.core.ui.R
 import comeayoua.growthspace.login.LoginScreenState
 import comeayoua.growthspace.login.LoginViewModel
-import comeayoua.growthspace.login.ui.stateholders.FormState
-import comeayoua.growthspace.login.ui.stateholders.LoginMode
+import comeayoua.growthspace.login.model.SignInInfo
+import comeayoua.growthspace.login.model.SignUpInfo
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onLogin: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState { 2 }
 
-    val loginMode: MutableState<LoginMode> = remember {
-        mutableStateOf(LoginMode.SignIn)
+    val openErrorSheet = rememberSaveable { mutableStateOf(false) }
+    val errorSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val openSuccessSheet = rememberSaveable { mutableStateOf(false) }
+    val successSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val signInAction: (
+        signInInfo: SignInInfo
+    ) -> Unit = remember {
+        { signInInfo ->
+            coroutineScope.launch {
+                with(signInInfo) {
+                    viewModel.signIn(email, password, onLogin)
+                }
+            }
+        }
     }
 
-    LaunchedEffect(loginMode.value) {
-        viewModel.updateFormState(FormState.Valid)
+    val signUpAction: (
+        signUpInfo: SignUpInfo
+    )-> Unit = remember{
+        { signUpInfo ->
+            coroutineScope.launch {
+                with(signUpInfo){
+                    viewModel.signUp(email, password, confirmPassword, onLogin)
+                }
+            }
+        }
     }
 
-    val formState by viewModel.formState.collectAsState()
+    val signInWithGoogleAction: () -> Unit = remember{
+        { coroutineScope.launch { viewModel.signInWithGoogle(context, onLogin) } }
+    }
+
+    val toSignInFormAction: () -> Unit = remember{
+        { coroutineScope.launch{pagerState.animateToAnotherForm(1) } }
+    }
 
     val gradient = Brush.radialGradient(
         0.0f to MaterialTheme.colorScheme.primaryContainer,
@@ -90,19 +124,55 @@ fun LoginScreen(
         label = ""
     )
 
-    val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
-    val windowWidth = with(density){ configuration.screenWidthDp.toDp().toPx().toInt() }
+    LaunchedEffect(key1 = uiState.value) {
+        when(uiState.value) {
+            is LoginScreenState.Error -> {
+                openSuccessSheet.value = false
+                openErrorSheet.value = true
+                errorSheetState.show()
+            }
+
+            is LoginScreenState.Success -> {
+                openErrorSheet.value = false
+                openSuccessSheet.value = true
+                successSheetState.show()
+            }
+            else -> {}
+        }
+    }
+
+    if (openErrorSheet.value || openSuccessSheet.value){
+        uiState.value.let {  state ->
+            when(state){
+                is LoginScreenState.Success -> SuccessBottomSheet(
+                    title = "Login success",
+                    message = null,
+                    onDismissRequest = { openSuccessSheet.value = false },
+                    sheetState = successSheetState
+                )
+                is LoginScreenState.Error -> ErrorBottomSheet(
+                    title = "Login failed",
+                    message = state.message,
+                    onDismissRequest = {
+                        openErrorSheet.value = false
+                        viewModel.dismissError()
+                    },
+                    sheetState = errorSheetState
+                )
+                else -> {}
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background
-    ) {paddingValues ->
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { paddingValues ->
+
         Box(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
         ){
             Spacer(
                 modifier = Modifier
@@ -115,13 +185,17 @@ fun LoginScreen(
                     .align(Alignment.Center)
             )
 
-            if (loginMode.value is LoginMode.SignUp){
+            if (pagerState.currentPage == 1){
                 Icon(
                     modifier = Modifier
-                        .padding(top = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
                         .size(32.dp)
                         .clip(CircleShape)
-                        .clickable { loginMode.value = LoginMode.SignIn },
+                        .clickable {
+                            coroutineScope.launch {
+                                pagerState.animateToAnotherForm(0)
+                            }
+                        },
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
                     contentDescription = "back to sign in"
                 )
@@ -132,65 +206,76 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.fillMaxHeight(0.1f))
 
                 Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = stringResource(R.string.Login_lead),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
                     lineHeight = 32.sp
                 )
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight(),
-                    contentAlignment = Alignment.Center
-                ) {
+                RegistrationPager(
+                    pagerState = pagerState,
+                    uiState = uiState,
+                    signInAction = signInAction,
+                    signUpAction = signUpAction,
+                    signInWithGoogleAction = signInWithGoogleAction,
+                    toSignInFormAction = toSignInFormAction
+                )
+            }
+        }
+    }
+}
 
-                    this@Column.AnimatedVisibility(
-                        visible = loginMode.value is LoginMode.SignIn,
-                        enter = slideInHorizontally { -windowWidth * 3 },
-                        exit = slideOutHorizontally { -windowWidth * 3 }
-                    ) {
-                        LoginForm(
-                            confirmPasswordField = false,
-                            createNewAccountLink = true,
-                            onLogin = { email, password, _ ->
-                                coroutineScope.launch {
-                                    if (viewModel.signIn(email, password)) onLogin()
-                                }
-                            },
-                            signInWithGoogle = {
-                                coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
-                            },
-                            toAnotherForm = { loginMode.value = LoginMode.SignUp },
-                            updateForm = {formState ->  viewModel.updateFormState(formState)},
-                            mainButtonIsLoading = { uiState is LoginScreenState.LoginningUp },
-                            googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
-                            formState = formState,
-                        )
-                    }
-                    this@Column.AnimatedVisibility(
-                        visible = loginMode.value is LoginMode.SignUp,
-                        enter = slideInHorizontally { windowWidth * 3},
-                        exit = slideOutHorizontally { windowWidth * 3 }
-                    ) {
-                        LoginForm(
-                            confirmPasswordField = true,
-                            createNewAccountLink = false,
-                            onLogin = { email, password, confirmPassword ->
-                                coroutineScope.launch {
-                                    if(viewModel.signUp(email, password, confirmPassword!!)) onLogin()
-                                }
-                            },
-                            signInWithGoogle = {
-                                coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
-                            },
-                            updateForm = {formState ->  viewModel.updateFormState(formState)},
-                            mainButtonIsLoading = { uiState is LoginScreenState.SigningUp },
-                            googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
-                            formState = formState
-                        )
-                    }
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun RegistrationPager(
+    pagerState: PagerState,
+    uiState: State<LoginScreenState>,
+    signInAction: (SignInInfo) -> Unit,
+    signUpAction: (SignUpInfo) -> Unit,
+    signInWithGoogleAction: () -> Unit,
+    toSignInFormAction: () -> Unit,
+){
+    Box(
+        modifier = Modifier
+            .fillMaxHeight(),
+        contentAlignment = Alignment.Center
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            userScrollEnabled = false,
+        ) { page ->
+            when(page){
+                0 -> {
+                    SignInForm(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onSignIn = signInAction,
+                        signInWithGoogle = signInWithGoogleAction,
+                        toSignUpForm = toSignInFormAction,
+                        uiState
+                    )
+                }
+                1 -> {
+                    SignUpForm(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onSignUp = signUpAction,
+                        signInWithGoogle = signInWithGoogleAction,
+                        uiState
+                    )
                 }
             }
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+internal suspend fun PagerState.animateToAnotherForm(
+    page: Int
+){
+    this.animateScrollToPage(
+        page,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessLow
+        )
+    )
 }

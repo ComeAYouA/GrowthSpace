@@ -1,8 +1,7 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 plugins {
     id("growth-space.android.library")
     id("growth-space.android.hilt")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -12,5 +11,7 @@ android {
 dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore)
-    implementation(libs.supabase.auth)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(project(":core:model"))
 }

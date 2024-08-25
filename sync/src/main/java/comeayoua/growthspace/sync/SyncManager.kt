@@ -1,9 +1,8 @@
 package comeayoua.growthspace.sync
 
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 
-interface ProjectSyncManager {
+interface SyncManager {
     val isSyncing: Flow<Boolean>
-    fun enqueueAddProjectsSync(keys: List<UUID>)
+    fun enqueueSync()
 }

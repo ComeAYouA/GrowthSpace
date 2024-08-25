@@ -1,7 +1,7 @@
 package comeayoua.growthspace.sync.di
 
-import comeayoua.growthspace.sync.ProjectSyncManager
-import comeayoua.growthspace.sync.worker.project.ProjectSyncManagerImpl
+import comeayoua.growthspace.sync.SyncManager
+import comeayoua.growthspace.sync.worker.project.SyncManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -11,5 +11,5 @@ import dagger.hilt.components.SingletonComponent
 @Module
 interface SyncModule {
     @Binds
-    fun bind_ProjectSyncManagerImpl_to_ProjectSyncManager(input: ProjectSyncManagerImpl): ProjectSyncManager
+    fun bind_ProjectSyncManagerImpl_to_ProjectSyncManager(input: SyncManagerImpl): SyncManager
 }

@@ -1,6 +1,5 @@
 package comeayoua.growthspace.datastore.prefernces
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -20,10 +19,6 @@ internal const val ONBOARDING_STATUS_KEY = "onboarding_status"
 internal class UserDataStoreImpl @Inject constructor(
     @UserPreferencesDataStore private val dataStore: DataStore<Preferences>
 ): UserDataStore {
-
-    init {
-        Log.d("myTag", this.toString())
-    }
 
     override suspend fun saveToken(token: String) {
         val userTokenKey = stringPreferencesKey(USER_TOKEN_KEY)

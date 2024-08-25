@@ -18,6 +18,7 @@ import comeayoua.growthspace.navigation.GrowthSpaceNavHost
 import comeayoua.growthspace.navigation.rememberAppUiState
 import comeayoua.growthspace.ui.theme.GrowthSpaceTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -30,7 +31,7 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             viewModel.uiState.collect()
         }
 

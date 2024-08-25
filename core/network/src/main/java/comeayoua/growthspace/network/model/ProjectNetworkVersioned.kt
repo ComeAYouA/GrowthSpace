@@ -12,9 +12,10 @@ import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Serializable
-data class ProjectNetworkExpanded(
+data class ProjectNetworkVersioned(
     @SerialName("project_id")
-    val id: Int,
+    @Serializable(with = UUIDSerializer::class)
+    val id: UUID,
     @SerialName("project_name")
     val name: String,
     @SerialName("description")
@@ -35,10 +36,14 @@ data class ProjectNetworkExpanded(
     val streak: Int,
     @SerialName("project_schedule")
     @Serializable(with = ProjectScheduleSerializer::class)
-    val projectSchedule: ProjectSchedule
+    val projectSchedule: ProjectSchedule,
+    @SerialName("change_version")
+    val changeVersion: Int,
+    @SerialName("is_deleted")
+    val isDeleted: Boolean
 )
 
-fun ProjectNetworkExpanded.asExternalModel(): Project =
+fun ProjectNetworkVersioned.asExternalModel(): Project =
     Project(
         id = id,
         name = name,
@@ -49,19 +54,8 @@ fun ProjectNetworkExpanded.asExternalModel(): Project =
         progress = progress,
         ownerId = ownerId,
         streak = streak,
-        projectSchedule = projectSchedule
+        projectSchedule = projectSchedule,
+        isSynced = false
     )
 
-fun Project.toExpandedNetworkResource(): ProjectNetworkExpanded =
-    ProjectNetworkExpanded(
-        id = id,
-        name = name,
-        description = description,
-        isPublic = isPublic,
-        projectType = projectType,
-        createdAt = createdAt,
-        progress = progress,
-        ownerId = ownerId,
-        streak = streak,
-        projectSchedule = projectSchedule
-    )
+

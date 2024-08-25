@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,5 +68,27 @@ fun SignInWithGoogleButton(
                     .align(Alignment.Center))
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun ShowContentButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    contentVisible: Boolean = true
+){
+    IconButton(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        Icon(
+            painter = if (contentVisible){
+                painterResource(id = R.drawable.ic_hide)
+            } else {
+                painterResource(id = R.drawable.ic_show)
+            },
+            contentDescription = "show or hide content"
+        )
     }
 }

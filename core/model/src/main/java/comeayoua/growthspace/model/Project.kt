@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 
 data class Project(
-    val id: Int,
+    val id: UUID,
     val name: String,
     val description: String,
     val isPublic: Boolean,
@@ -13,5 +13,6 @@ data class Project(
     val progress: Int,
     val ownerId: UUID,
     val streak: Int,
-    val projectSchedule: ProjectSchedule
+    val projectSchedule: ProjectSchedule,
+    var isSynced: Boolean = false
 )

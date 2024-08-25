@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +51,7 @@ import comeayoua.growthspace.onboarding.ui.model.rememberOnBoardingPages
 @Composable
 internal fun OnBoardingScreen(
     modifier: Modifier = Modifier,
-    onStartButtonClicked: () -> Unit,
+    onStartButtonClicked: () -> Unit = {},
     viewModel: OnBoardingViewModel = hiltViewModel()
 ){
     val pagerState = rememberPagerState { 3 }
@@ -70,7 +71,7 @@ internal fun OnBoardingScreen(
                 OnBoardingPage(
                     lead = onBoardingPages.pages[page].lead,
                     description = onBoardingPages.pages[page].desc,
-                    imgId = onBoardingPages.pages[page].imgId
+                    imgId = onBoardingPages.pages[page].imgId,
                 )
             }
 
@@ -89,6 +90,52 @@ internal fun OnBoardingScreen(
                 onClick = {
                     viewModel.saveOnBoardingStatus()
                     onStartButtonClicked()
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Preview
+@Composable
+fun OnBoardingScreenPreview(
+    modifier: Modifier = Modifier
+){
+    val pagerState = rememberPagerState { 3 }
+    val onBoardingPages = rememberOnBoardingPages()
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ){
+            HorizontalPager(
+                modifier = Modifier,
+                state = pagerState
+            ) { page ->
+                OnBoardingPage(
+                    lead = onBoardingPages.pages[page].lead,
+                    description = onBoardingPages.pages[page].desc,
+                    imgId = onBoardingPages.pages[page].imgId,
+                )
+            }
+
+            PagerNavigation(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                pagerState = pagerState
+            )
+
+            GoForwardButton(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(24.dp),
+                isVisible = { pagerState.currentPage == pagerState.pageCount - 1 },
+                onClick = {
                 }
             )
         }
@@ -154,18 +201,20 @@ internal fun PagerNavigation(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun OnBoardingPage(
     lead: String,
     description: String,
     @DrawableRes imgId: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ){
     val density = LocalDensity.current
 
     val headerBottom = remember{
         mutableStateOf(0.dp)
     }
+
     Column(
         modifier = modifier
             .fillMaxSize(),
@@ -185,6 +234,7 @@ internal fun OnBoardingPage(
                 ),
         ) {
             Text(
+                modifier = Modifier,
                 text = lead,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 32.sp,

@@ -11,8 +11,7 @@ import java.util.UUID
 @Entity
 data class ProjectEntity(
     @PrimaryKey
-    val key: UUID = UUID.randomUUID(),
-    var id: Int,
+    var id: UUID = UUID.randomUUID(),
     val name: String,
     val description: String,
     val isPublic: Boolean,
@@ -21,7 +20,8 @@ data class ProjectEntity(
     val progress: Int,
     val ownerId: UUID,
     val streak: Int,
-    val daysOfWeek: ProjectSchedule
+    val daysOfWeek: ProjectSchedule,
+    var isSynced: Boolean = false
 )
 
 fun ProjectEntity.asExternalModel(): Project
@@ -35,7 +35,8 @@ fun ProjectEntity.asExternalModel(): Project
         progress = this.progress,
         ownerId = this.ownerId,
         streak = this.streak,
-        projectSchedule = this.daysOfWeek
+        projectSchedule = this.daysOfWeek,
+        isSynced = isSynced
     )
 
 fun Project.asEntity(): ProjectEntity
@@ -49,5 +50,6 @@ fun Project.asEntity(): ProjectEntity
         progress = this.progress,
         ownerId = this.ownerId,
         streak = this.streak,
-        daysOfWeek = this.projectSchedule
+        daysOfWeek = this.projectSchedule,
+        isSynced = this.isSynced
     )

@@ -13,6 +13,9 @@ import java.util.UUID
 
 @Serializable
 data class ProjectNetwork(
+    @SerialName("project_id")
+    @Serializable(with = UUIDSerializer::class)
+    val id: UUID,
     @SerialName("project_name")
     val name: String,
     @SerialName("description")
@@ -36,22 +39,10 @@ data class ProjectNetwork(
     val projectSchedule: ProjectSchedule
 )
 
-fun ProjectNetwork.asExternalModel(id: Int): Project =
-    Project(
-        id = id,
-        name = name,
-        description = description,
-        isPublic = isPublic,
-        projectType = projectType,
-        createdAt = createdAt,
-        progress = progress,
-        ownerId = ownerId,
-        streak = streak,
-        projectSchedule = projectSchedule
-    )
 
-fun Project.toNetworkResource(): ProjectNetwork =
+fun Project.toExpandedNetworkResource(): ProjectNetwork =
     ProjectNetwork(
+        id = id,
         name = name,
         description = description,
         isPublic = isPublic,
