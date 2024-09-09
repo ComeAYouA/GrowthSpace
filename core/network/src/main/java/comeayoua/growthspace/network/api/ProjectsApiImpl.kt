@@ -1,6 +1,7 @@
 package comeayoua.growthspace.network.api
 
 import comeayoua.growthspace.network.ProjectsApi
+import comeayoua.growthspace.network.model.ExpandedVersionList
 import comeayoua.growthspace.network.model.ProjectNetwork
 import comeayoua.growthspace.network.model.ProjectNetworkVersioned
 import comeayoua.growthspace.network.model.VersionParameter
@@ -34,29 +35,32 @@ class ProjectsApiImpl @Inject constructor(
 
     override suspend fun insertProjects(
         projects: List<ProjectNetwork>,
-        commitVersion: Int
     ) = withContext(Dispatchers.IO) {
         val userId = auth.currentUserOrNull()!!.id
         val userUUID = UUID.fromString(userId)
 
         val projectsToInsert =  projects.map { project -> project.copy(ownerId = userUUID) }
 
-        val insertResult = supabase.from("projects")
+        supabase.from("projects")
             .insert(projectsToInsert) { this.select() }
             .decodeList<ProjectNetwork>()
 
-        insertResult
+        getProjectsVersion()
     }
 
     override suspend fun updateProjects(
         projects: List<ProjectNetwork>,
-        commitVersion: Int
     ) = withContext(Dispatchers.IO) {
         supabase.from("projects").upsert(
             projects,
             onConflict = "project_id"
         )
 
-        Unit
+        getProjectsVersion()
+    }
+
+    override suspend fun getProjectsVersion(): Int = withContext(Dispatchers.IO){
+        supabase.from("user_version_list")
+            .select().decodeAs<ExpandedVersionList>().projectsVersion
     }
 }

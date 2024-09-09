@@ -8,7 +8,9 @@ interface ProjectsApi {
     suspend fun getUpdates(version: Int): List<ProjectNetworkVersioned>
     suspend fun insertProjects(
         projects: List<ProjectNetwork>,
-        commitVersion: Int
-    ): List<ProjectNetwork>
-    suspend fun updateProjects(projects: List<ProjectNetwork>, commitVersion: Int)
+    ): Int
+    suspend fun updateProjects(
+        projects: List<ProjectNetwork>,
+    ): Int
+    suspend fun getProjectsVersion(): Int
 }

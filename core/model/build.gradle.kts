@@ -4,6 +4,6 @@ plugins {
 }
 
 dependencies{
-    implementation(libs.jetbrains.kotlinx.datetime)
+    api(libs.jetbrains.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
 }

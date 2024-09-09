@@ -23,6 +23,7 @@ class OfflineFirstProjectsRepository @Inject constructor(
     private val projectsApi: ProjectsApi,
     private val versionListStore: VersionListStore
 ): ProjectsRepository {
+    //TODO("delete projects")
     override suspend fun syncData(): Boolean {
         return try {
             val version = versionListStore.getVersionList().projectsListVersion
@@ -51,21 +52,20 @@ class OfflineFirstProjectsRepository @Inject constructor(
                 }
             }
 
-            versionListStore.updateVersionList {
-                it.copy(projectsListVersion = nextVersion)
+            versionListStore.updateVersionList { versionList ->
+                versionList.copy(projectsListVersion = nextVersion)
             }
 
             // fetching local updates
             val localUpdates = projectsDataBase.getProjectsUpdates()
 
             // update project in network
-            projectsApi.updateProjects(
+            nextVersion = projectsApi.updateProjects(
                 localUpdates.map { project ->
                     project
                     .asExternalModel()
                     .toExpandedNetworkResource()
-                },
-                0
+                }
             )
 
             // set sync flag in local database
@@ -73,6 +73,10 @@ class OfflineFirstProjectsRepository @Inject constructor(
                 projectsDataBase.updateProject(
                     project.copy(isSynced = true)
                 )
+            }
+
+            versionListStore.updateVersionList { versionList ->
+                versionList.copy(projectsListVersion = nextVersion)
             }
 
             true

@@ -65,9 +65,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import comeayoua.growthspace.core.ui.R
 import comeayoua.growthspace.model.ProjectSchedule
+import comeayoua.growthspace.ui.widgets.WeekRow
 import kotlinx.coroutines.launch
 
-@Preview
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
@@ -290,8 +290,8 @@ fun Tabs(
 @Composable
 fun ProjectItem(
     modifier: Modifier = Modifier,
-    title: String = "Project",
-    streak: Int = 3,
+    title: String = "No smoking",
+    routineType: String = "Everyday",
     schedule: ProjectSchedule = ProjectSchedule(
         thursday = true, sunday = true
     )
@@ -311,7 +311,7 @@ fun ProjectItem(
         modifier = Modifier
             .clip(RoundedCornerShape(14.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(8.dp)
+            .padding(16.dp)
     ) {
         Row{
             Image(
@@ -325,41 +325,29 @@ fun ProjectItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
             ){
+                Text(
+                    text = routineType,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Normal
+                )
+
                 Text(
                     text = title,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Medium
                 )
-
-                Text(
-                    modifier = Modifier
-                        .padding(top = 8.dp),
-                    text = "$streak days streak",
-                    color = Color.Gray
-                )
-
-                Row(
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    daysOfWeek.forEach{
-                        Spacer(
-                            modifier = Modifier
-                                .padding(end = 4.dp)
-                                .size(15.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(
-                                    if (it)
-                                        MaterialTheme.colorScheme.inversePrimary
-                                    else
-                                        MaterialTheme.colorScheme.surfaceDim
-                                )
-
-                        )
-                    }
-                }
             }
         }
+        WeekRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = 8.dp
+                ),
+            currentDayIdx = 1,
+            selectedTabs = setOf(1)
+        )
     }
 }
