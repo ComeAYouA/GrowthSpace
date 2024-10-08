@@ -6,11 +6,6 @@ plugins {
 
 android {
     namespace = "comeayoua.growthspace"
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
 
 dependencies {
@@ -19,9 +14,17 @@ dependencies {
     implementation(libs.junit)
     implementation(libs.androidx.test.ext.junit)
     implementation(libs.androidx.splashscreen)
+    implementation(libs.androidx.work.ktx)
 
 
-    implementation(project(":core:data"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:model"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:database"))
+    implementation(project(":core:network"))
+    implementation(project(":sync"))
     implementation(project(":feature:login"))
     implementation(project(":feature:projects"))
+    implementation(project(":feature:onboarding"))
+    implementation(libs.androidx.hilt.work)
 }

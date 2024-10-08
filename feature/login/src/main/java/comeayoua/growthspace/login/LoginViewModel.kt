@@ -1,85 +1,75 @@
-//package comeayoua.growthspace.login
-//
-//import android.util.Log
-//import androidx.compose.runtime.collectAsState
-//import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.viewModelScope
-//import comeayoua.growthspace.auth.UserDataRepository
-//import dagger.hilt.android.lifecycle.HiltViewModel
-//import io.github.jan.supabase.compose.auth.ComposeAuth
-//import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
-//import io.github.jan.supabase.gotrue.Auth
-//import io.github.jan.supabase.gotrue.SessionStatus
-//import io.github.jan.supabase.gotrue.providers.Google
-//import kotlinx.coroutines.async
-//import kotlinx.coroutines.delay
-//import kotlinx.coroutines.flow.MutableStateFlow
-//import kotlinx.coroutines.flow.asStateFlow
-//import kotlinx.coroutines.flow.collect
-//import kotlinx.coroutines.flow.flow
-//import kotlinx.coroutines.flow.update
-//import kotlinx.coroutines.launch
-//import javax.inject.Inject
-//
-//@HiltViewModel
-//class LoginViewModel @Inject constructor(
-//    val composeAuth: ComposeAuth,
-//    private val auth: Auth,
-//    private val userDataRepository: UserDataRepository
-//): ViewModel() {
-//    private val _uiState: MutableStateFlow<LoginScreenState> = MutableStateFlow(LoginScreenState.Loading)
-//    val uiState = _uiState.asStateFlow()
-//
-//    init {
-//        checkLoggStatus()
-//    }
-//
-//
-//    private suspend fun saveToken(){
-//        val token = auth.currentAccessTokenOrNull()
-//
-//        userDataRepository.saveLoginToken(token)
-//    }
-//
-//    private suspend fun getToken(): String? = userDataRepository.getLoginToken()
-//
-//    fun NativeSignInResult.retrieveGoogleAuth(){
-//        when(this){
-//            NativeSignInResult.Success -> {
-//                viewModelScope.launch {
-//                    _uiState.update {
-//                        LoginScreenState.Loading
-//                    }
-//
-//                    saveToken()
-//
-//                    _uiState.update {
-//                        LoginScreenState.LoggedIn
-//                    }
-//                }
-//            }
-//            else -> {}
-//        }
-//    }
-//
-//    private fun checkLoggStatus(){
-//        viewModelScope.launch {
-//            try {
-//                val token = getToken()
-//
-//                if(token.isNullOrEmpty()) {
-//
-//                } else {
-//                    auth.retrieveUser(token)
-//                    auth.refreshCurrentSession()
-//                    saveToken()
-//                    _uiState.update {
-//                        LoginScreenState.LoggedIn
-//                    }
-//                }
-//            } catch (e: Exception) {
-//
-//            }
-//        }
-//    }
-//}
+package comeayoua.growthspace.login
+
+import android.content.Context
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import comeayoua.growthspace.domain.login.SignInWithGoogleUseCase
+import comeayoua.growthspace.login.utils.handleLoginException
+import comeayoua.growthspace.login.utils.rawNonceToGoogleOptions
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.util.UUID
+import javax.inject.Inject
+
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
+): ViewModel() {
+    private val _uiState: MutableStateFlow<LoginScreenState> = MutableStateFlow(LoginScreenState.Enabled)
+    val uiState = _uiState.asStateFlow()
+
+    fun signInWithGoogle(context: Context, onSignIn: () -> Unit) =
+        viewModelScope.launch {
+            _uiState.value = LoginScreenState.SyncingWithGoogle
+
+            val rawNonce = UUID.randomUUID().toString()
+            val googleOption = rawNonceToGoogleOptions(rawNonce)
+
+            val credentialManager = CredentialManager.create(context)
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleOption)
+                .build()
+
+            val signInResult: Result<Boolean> = try {
+                val credentialManagerResult = credentialManager.getCredential(
+                    request = request,
+                    context = context
+                )
+
+                val credential = credentialManagerResult.credential
+                val googleIdTokenCredential = GoogleIdTokenCredential
+                    .createFrom(credential.data)
+                val googleIdToken = googleIdTokenCredential.idToken
+
+                signInWithGoogleUseCase(
+                    googleIdToken = googleIdToken,
+                    rawNonce = rawNonce
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                handleLoginException(e)
+            }
+
+            signInResult.getOrNull()?.let { success ->
+                _uiState.value = LoginScreenState.Enabled
+
+                if (success) {
+                    _uiState.value = LoginScreenState.Success
+                    delay(1000)
+                    onSignIn.invoke()
+                }
+            } ?: run {
+                _uiState.value = LoginScreenState.Error(
+                    signInResult.exceptionOrNull()?.message ?: "Unknown Error"
+                )
+            }
+        }
+}

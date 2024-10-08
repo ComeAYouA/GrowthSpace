@@ -2,16 +2,16 @@ package comeayoua.growthspace.projects.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
-import comeayoua.growthspace.projects.Projects
+import comeayoua.growthspace.projects.ProjectsScreen
 
 const val PROJECTS_ROUTE = "projects_route"
 private const val URI_PATTERN_LINK = "https://www.comayoua.growthspace/projects"
 
-fun NavController.navigateToProjectsScreen(navOptions: NavOptions)
-        = this.navigate(PROJECTS_ROUTE, navOptions)
+fun NavController.navigateToProjectsScreen(navOptionsBuilder: NavOptionsBuilder.() -> Unit = {})
+        = this.navigate(PROJECTS_ROUTE, navOptionsBuilder)
 
 fun NavGraphBuilder.projectsScreen() {
     composable(
@@ -20,6 +20,6 @@ fun NavGraphBuilder.projectsScreen() {
             navDeepLink { uriPattern = URI_PATTERN_LINK },
         ),
     ) {
-        Projects()
+        ProjectsScreen()
     }
 }

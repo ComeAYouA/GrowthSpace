@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Onboarding_lead_1">Space for your growth</string>
+    <string name="Onboarding_desc_1">Manage your habits and self-development, and track your progress</string>
+    <string name="Onboarding_lead_2">Connect with like-minded people and get inspired.</string>
+    <string name="Onboarding_desc_2">Join communities and contribute to their development by adding a project to your favorites. Join the discussion via chat and find friends with similar interests</string>
+    <string name="Onboarding_lead_3">Step by step towards your goal.</string>
+    <string name="Onboarding_desc_3">Monitor your progress using the project tree, mark important events in milestones and receive rewards</string>
+    <string name="Login_lead">Get ready for a world of growing spaces</string>
+    <string name="Login">Log in</string>
+    <string name="SignUp">Sign up</string>
+    <string name="SignIn">Sign in</string>
+    <string name="Email">Email</string>
+    <string name="Password">Password</string>
+    <string name="ConfirmPassword">Confirm password</string>
+</resources>
