@@ -24,7 +24,7 @@ class ProjectsViewModel @Inject constructor(
     private val syncManager: SyncManager
 ): ViewModel() {
     init {
-//        syncManager.enqueueSync()
+        syncManager.enqueueSync()
         viewModelScope.launch {
             getProjectsUseCase().collect{
                 Log.d("myTag", it.toString())

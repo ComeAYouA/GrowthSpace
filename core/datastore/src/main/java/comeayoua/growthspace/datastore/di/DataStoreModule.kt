@@ -14,6 +14,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 private const val USER_DATA_NAME = "user_data"
 
@@ -33,6 +34,7 @@ internal interface DataStoreModule {
         private val Context.userDataStore by preferencesDataStore(name = USER_DATA_NAME)
 
         @UserPreferencesDataStore
+        @Singleton
         @Provides
         fun providesUserDataStore(
             @ApplicationContext context: Context

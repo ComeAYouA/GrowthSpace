@@ -23,7 +23,6 @@ class OfflineFirstProjectsRepository @Inject constructor(
     private val projectsApi: ProjectsApi,
     private val versionListStore: VersionListStore
 ): ProjectsRepository {
-    //TODO("delete projects")
     override suspend fun syncData(): Boolean {
         return try {
             val version = versionListStore.getVersionList().projectsListVersion
