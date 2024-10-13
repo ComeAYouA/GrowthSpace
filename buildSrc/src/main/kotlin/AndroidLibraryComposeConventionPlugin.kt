@@ -4,17 +4,14 @@ import org.gradle.kotlin.dsl.dependencies
 
 class AndroidLibraryComposeConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {
-
         with(target){
+            with(pluginManager) {
+                apply("org.jetbrains.kotlin.plugin.compose")
+            }
 
             androidLib().apply {
                 buildFeatures {
                     compose = true
-                }
-
-                composeOptions {
-                    kotlinCompilerExtensionVersion = versionCatalog
-                        .findVersion("kotlinCompilerExtensionVersion").get().toString()
                 }
             }
 

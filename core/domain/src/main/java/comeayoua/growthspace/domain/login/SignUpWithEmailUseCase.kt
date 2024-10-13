@@ -1,9 +1,9 @@
 package comeayoua.growthspace.domain.login
 
 import comeayoua.growthspace.data.UserDataRepository
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException

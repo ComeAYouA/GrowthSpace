@@ -1,6 +1,7 @@
 package comeayoua.growthspace.login
 
 import android.content.Context
+import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
@@ -55,7 +56,8 @@ class LoginViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                handleLoginException(e)
+//                handleLoginException(e)
+                throw e
             }
 
             signInResult.getOrNull()?.let { success ->

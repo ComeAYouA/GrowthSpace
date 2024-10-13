@@ -7,7 +7,7 @@ import comeayoua.growthspace.network.model.ProjectNetwork
 import comeayoua.growthspace.network.model.ProjectNetworkVersioned
 import comeayoua.growthspace.network.model.VersionParameter
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.rpc
@@ -65,8 +65,7 @@ class ProjectsApiImpl @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             supabase.from("projects").upsert(
-                projects,
-                onConflict = "project_id"
+                projects
             )
 
             getProjectsVersion()

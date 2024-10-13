@@ -1,10 +1,10 @@
 package comeayoua.growthspace.domain.login
 
 import comeayoua.growthspace.data.UserDataRepository
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.providers.Google
-import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
