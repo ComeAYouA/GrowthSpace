@@ -11,8 +11,9 @@ fun rawNonceToGoogleOptions(rawNonce: String): GetGoogleIdOption{
     val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it)}
 
     val googleOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-        .setFilterByAuthorizedAccounts(false)
+        .setFilterByAuthorizedAccounts(true)
         .setServerClientId(BuildConfig.clientId)
+        .setAutoSelectEnabled(true)
         .setNonce(hashedNonce)
         .build()
 
