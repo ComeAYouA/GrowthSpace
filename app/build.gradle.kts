@@ -26,5 +26,5 @@ dependencies {
     implementation(project(":feature:login"))
     implementation(project(":feature:projects"))
     implementation(project(":feature:onboarding"))
-    implementation(libs.androidx.hilt.work)
+    implementation(libs.hilt.ext.work)
 }
