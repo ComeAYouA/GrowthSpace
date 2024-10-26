@@ -1,6 +1,5 @@
 package comeayoua.growthspace.network.api
 
-import android.util.Log
 import comeayoua.growthspace.network.ProjectsApi
 import comeayoua.growthspace.network.model.ExpandedVersionList
 import comeayoua.growthspace.network.model.ProjectNetwork
@@ -21,15 +20,12 @@ class ProjectsApiImpl @Inject constructor(
     private val auth: Auth,
 ): ProjectsApi {
     override suspend fun getProjects(): List<ProjectNetwork> {
-        Log.d("myTag", "network:getProjects")
         return supabase.from("projects").select().decodeList()
     }
 
     override suspend fun getUpdates(
         version: Int
     ): List<ProjectNetworkVersioned> {
-        Log.d("myTag", "network:getUpdates")
-
         return withContext(Dispatchers.IO) {
             supabase.postgrest.rpc(
                 "get_projects_updates",
@@ -42,8 +38,6 @@ class ProjectsApiImpl @Inject constructor(
     override suspend fun insertProjects(
         projects: List<ProjectNetwork>
     ): Int {
-        Log.d("myTag", "network:insertProjects")
-
         return withContext(Dispatchers.IO) {
             val userId = auth.currentUserOrNull()!!.id
             val userUUID = UUID.fromString(userId)
@@ -61,7 +55,6 @@ class ProjectsApiImpl @Inject constructor(
     override suspend fun updateProjects(
         projects: List<ProjectNetwork>,
     ): Int {
-        Log.d("myTag", "network:updateProjects")
 
         return withContext(Dispatchers.IO) {
             supabase.from("projects").upsert(
@@ -73,8 +66,6 @@ class ProjectsApiImpl @Inject constructor(
     }
 
     override suspend fun getProjectsVersion(): Int {
-        Log.d("myTag", "network:updateProjects")
-
         return withContext(Dispatchers.IO){
             supabase.from("user_version_list")
                 .select().decodeAs<ExpandedVersionList>().projectsVersion

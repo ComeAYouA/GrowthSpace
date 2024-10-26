@@ -1,7 +1,6 @@
 package comeayoua.growthspace.sync.worker.project
 
 import android.content.Context
-import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -26,7 +25,6 @@ class SyncManagerImpl @Inject constructor(
     override fun enqueueSync(){
         val workManager = WorkManager.getInstance(context)
 
-        Log.d("myTag", "enqueue")
         workManager.enqueueUniqueWork(
             PROJECTS_SYNC_WORK_NAME,
             ExistingWorkPolicy.APPEND_OR_REPLACE,

@@ -1,6 +1,5 @@
 package comeayoua.growthspace.projects
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import comeayoua.growthspace.domain.project.AddProjectUseCase
@@ -23,14 +22,6 @@ class ProjectsViewModel @Inject constructor(
     private val updateProjectsUseCase: UpdateProjectsUseCase,
     private val syncManager: SyncManager
 ): ViewModel() {
-    init {
-        syncManager.enqueueSync()
-        viewModelScope.launch {
-            getProjectsUseCase().collect{
-                Log.d("myTag", it.toString())
-            }
-        }
-    }
 
     fun addProject(){
         viewModelScope.launch {

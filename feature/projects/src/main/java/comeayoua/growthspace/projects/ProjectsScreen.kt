@@ -1,6 +1,5 @@
 package comeayoua.growthspace.projects
 
-import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -106,7 +105,7 @@ fun ProjectsScreen(
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier,
-                        onClick = { Log.d("myTag", "menu") }
+                        onClick = {  }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Menu,

@@ -2,7 +2,6 @@ package comeayoua.growthspace.sync.worker.project
 
 import android.app.Notification
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -27,18 +26,11 @@ class SyncWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val projectsRepository: ProjectsRepository
 ): CoroutineWorker(context, workerParams) {
-    init {
-        Log.d("myTag", "worker init")
-    }
     override suspend fun doWork(): Result = withContext(Dispatchers.IO){
         try {
-            Log.d("myTag", "start work")
-
-            val success = projectsRepository.syncData()
-            if (success) Result.success() else Result.retry()
-
+            val isSyncSucceed = projectsRepository.syncData()
+            if (isSyncSucceed) Result.success() else Result.retry()
         }catch (e: Exception){
-            Log.d("myTag", "$e")
             Result.retry()
         }
     }

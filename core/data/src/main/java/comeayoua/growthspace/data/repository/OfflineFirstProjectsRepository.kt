@@ -1,6 +1,5 @@
 package comeayoua.growthspace.data.repository
 
-import android.util.Log
 import comeayoua.growthspace.data.ProjectsRepository
 import comeayoua.growthspace.database.ProjectsDao
 import comeayoua.growthspace.database.model.ProjectEntity
@@ -80,7 +79,6 @@ class OfflineFirstProjectsRepository @Inject constructor(
 
             true
         }catch (e: Exception){
-            Log.d("myTag", e.message.toString())
             false
         }
     }

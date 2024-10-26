@@ -1,6 +1,5 @@
 package comeayoua.growthspace.domain
 
-import android.util.Log
 import comeayoua.growthspace.data.UserDataRepository
 import comeayoua.growthspace.model.UserData
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,6 @@ class GetUserDataUseCase @Inject constructor(
             getTokenFlow,
             onBoardingFlow
         ){ token, isOnBoarded ->
-            Log.d("myTag", token.toString())
             val isLoggedIn = token != null
 
             UserData(
