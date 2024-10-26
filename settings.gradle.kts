@@ -21,7 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "GrowthSpace"
 include(":app")
-include(":core:data")
+include(":core:datastore")
 include(":core:network")
 include(":feature:login")
 include(":feature:projects")
@@ -29,3 +29,7 @@ include(":core:ui")
 include(":feature:onboarding")
 include(":core:domain")
 include(":core:model")
+include(":core:data")
+include(":core:database")
+include(":core:util")
+include(":sync")

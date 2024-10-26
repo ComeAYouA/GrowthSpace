@@ -1,190 +1,116 @@
 package comeayoua.growthspace.login.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.EaseInOutQuad
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import comeayoua.growthspace.core.ui.R
 import comeayoua.growthspace.login.LoginScreenState
 import comeayoua.growthspace.login.LoginViewModel
-import comeayoua.growthspace.login.ui.stateholders.FormState
-import comeayoua.growthspace.login.ui.stateholders.LoginMode
-import kotlinx.coroutines.launch
+import comeayoua.growthspace.ui.widgets.SignInWithGoogleButton
+
 
 @Composable
 fun LoginScreen(
     onLogin: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
+    val uiState = viewModel.uiState.collectAsState()
+    val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
 
-    val loginMode: MutableState<LoginMode> = remember {
-        mutableStateOf(LoginMode.SignIn)
-    }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { paddingValues ->
 
-    LaunchedEffect(loginMode.value) {
-        viewModel.updateFormState(FormState.Valid)
-    }
+        Box(
+            modifier = Modifier
+                .padding(
+                    bottom = paddingValues.calculateBottomPadding(),
+                    end = paddingValues.calculateEndPadding(layoutDirection),
+                    start = paddingValues.calculateStartPadding(layoutDirection),
 
-    val formState by viewModel.formState.collectAsState()
-
-    val gradient = Brush.radialGradient(
-        0.0f to MaterialTheme.colorScheme.primaryContainer,
-        1f to MaterialTheme.colorScheme.background
-    )
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    val gradientAnim by infiniteTransition.animateFloat(
-        initialValue = 0.8f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            repeatMode = RepeatMode.Reverse,
-            animation = tween(
-                durationMillis = 3000,
-                easing = EaseInOutQuad
+                )
+                .fillMaxSize()
+        ){
+            LoginContent(
+                uiState = uiState,
+                onLogin = { viewModel.signInWithGoogle(context, onLogin) }
             )
-        ),
-        label = ""
-    )
+        }
+    }
+}
 
-    val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
-    val windowWidth = with(density){ configuration.screenWidthDp.toDp().toPx().toInt() }
+@Composable
+fun LoginContent(
+    modifier: Modifier = Modifier,
+    uiState: State<LoginScreenState>,
+    onLogin: () -> Unit = {}
+){
+    val gradient = Brush.verticalGradient(
+        0.0f to Color.Transparent,
+        0.3f to MaterialTheme.colorScheme.background
+    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp)
     ){
-        Spacer(
+        Image(
             modifier = Modifier
-                .graphicsLayer {
-                    scaleX = gradientAnim
-                    scaleY = gradientAnim
-                }
                 .fillMaxSize()
-                .background(gradient)
-                .align(Alignment.Center)
+                .padding(bottom = 128.dp),
+            painter = painterResource(id = R.mipmap.img_login_background),
+            contentScale = ContentScale.Crop,
+            contentDescription = null
         )
-
-        if (loginMode.value is LoginMode.SignUp){
-            Icon(
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .clickable { loginMode.value = LoginMode.SignIn },
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = "back to sign in"
-            )
-        }
-
-
-        Column {
-            Spacer(modifier = Modifier.fillMaxHeight(0.1f))
-
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .background(gradient)
+                .padding(horizontal = 16.dp, vertical = 64.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
-                text = stringResource(R.string.Login_lead),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                lineHeight = 32.sp
+                text = "Create Account",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Medium,
             )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight(),
-                contentAlignment = Alignment.Center
-            ) {
-
-                this@Column.AnimatedVisibility(
-                    visible = loginMode.value is LoginMode.SignIn,
-                    enter = slideInHorizontally { -windowWidth * 3 },
-                    exit = slideOutHorizontally { -windowWidth * 3 }
-                ) {
-                    LoginForm(
-                        confirmPasswordField = false,
-                        createNewAccountLink = true,
-                        onLogin = { email, password, _ ->
-                            coroutineScope.launch {
-                                if (viewModel.signIn(email, password)) onLogin()
-                            }
-                        },
-                        signInWithGoogle = {
-                            coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
-                        },
-                        toAnotherForm = { loginMode.value = LoginMode.SignUp },
-                        updateForm = {formState ->  viewModel.updateFormState(formState)},
-                        mainButtonIsLoading = { uiState is LoginScreenState.LoginningUp },
-                        googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
-                        formState = formState,
-                    )
-                }
-                this@Column.AnimatedVisibility(
-                    visible = loginMode.value is LoginMode.SignUp,
-                    enter = slideInHorizontally { windowWidth * 3},
-                    exit = slideOutHorizontally { windowWidth * 3 }
-                ) {
-                    LoginForm(
-                        confirmPasswordField = true,
-                        createNewAccountLink = false,
-                        onLogin = { email, password, confirmPassword ->
-                            coroutineScope.launch {
-                                if(viewModel.signUp(email, password, confirmPassword!!)) onLogin()
-                            }
-                        },
-                        signInWithGoogle = {
-                            coroutineScope.launch { if (viewModel.signInWithGoogle(context)) onLogin() }
-                        },
-                        updateForm = {formState ->  viewModel.updateFormState(formState)},
-                        mainButtonIsLoading = { uiState is LoginScreenState.SigningUp },
-                        googleButtonIsLoading = { uiState is LoginScreenState.SyncingWithGoogle },
-                        formState = formState
-                    )
-                }
-            }
+            Text(
+                modifier = Modifier.padding(top = 16.dp),
+                text = "Log in to your Google account to save your progress and share habits with friends",
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+            SignInWithGoogleButton(
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = onLogin,
+                isLoading = { uiState.value is LoginScreenState.SyncingWithGoogle }
+            )
         }
     }
 }

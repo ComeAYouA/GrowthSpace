@@ -6,14 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +18,7 @@ import comeayoua.growthspace.navigation.GrowthSpaceNavHost
 import comeayoua.growthspace.navigation.rememberAppUiState
 import comeayoua.growthspace.ui.theme.GrowthSpaceTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -34,7 +31,7 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             viewModel.uiState.collect()
         }
 
@@ -50,21 +47,15 @@ class MainActivity : ComponentActivity() {
             ) {
                 val uiState = viewModel.uiState.collectAsState()
 
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.background
-                ) { innerPadding ->
-                    uiState.value.let { state ->
-                        if (state is MainScreenUiState.IsReady){
-                            MainScreen(
-                                modifier = Modifier.padding(innerPadding),
-                                appUiState = rememberAppUiState(
-                                    windowSizeClass = calculateWindowSizeClass(activity = this),
-                                    userData = state.userData
-                                )
+                uiState.value.let { state ->
+                    if (state is MainScreenUiState.IsReady){
+                        MainScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            appUiState = rememberAppUiState(
+                                windowSizeClass = calculateWindowSizeClass(activity = this),
+                                userData = state.userData
                             )
-                        }
+                        )
                     }
                 }
             }

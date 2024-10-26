@@ -1,12 +1,6 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
-val apiKey: String = gradleLocalProperties(rootDir).getProperty("supabaseApiKey")
-val url: String = gradleLocalProperties(rootDir).getProperty("supabaseUrl")
-
 plugins {
     id("growth-space.android.library")
     id("growth-space.android.hilt")
-    id("growth-space.android.ktor")
 }
 
 android {
@@ -14,5 +8,10 @@ android {
 }
 
 dependencies {
-    implementation(libs.supabase.gotrue)
+    api(project(":core:model"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:database"))
+    implementation(project(":core:network"))
+
+    implementation(libs.androidx.work.ktx)
 }

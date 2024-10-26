@@ -1,6 +1,5 @@
 package comeayoua.growthspace.login.utils
 
-import androidx.credentials.CredentialManager
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import comeayoua.growthspace.feature.login.BuildConfig
 import java.security.MessageDigest

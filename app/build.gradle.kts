@@ -14,12 +14,17 @@ dependencies {
     implementation(libs.junit)
     implementation(libs.androidx.test.ext.junit)
     implementation(libs.androidx.splashscreen)
+    implementation(libs.androidx.work.ktx)
 
 
     implementation(project(":core:domain"))
     implementation(project(":core:model"))
     implementation(project(":core:ui"))
+    implementation(project(":core:database"))
+    implementation(project(":core:network"))
+    implementation(project(":sync"))
     implementation(project(":feature:login"))
     implementation(project(":feature:projects"))
     implementation(project(":feature:onboarding"))
+    implementation(libs.hilt.ext.work)
 }
