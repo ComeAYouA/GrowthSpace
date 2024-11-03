@@ -35,7 +35,7 @@ import comeayoua.growthspace.ui.widgets.SignInWithGoogleButton
 
 @Composable
 fun LoginScreen(
-    onLogin: () -> Unit = {},
+    onLogin: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState = viewModel.uiState.collectAsState()

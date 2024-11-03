@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "comeayoua.growthspace.feature.projects"
+    namespace = "comeayoua.growthspace.feature.project.add"
 }
 
 dependencies {

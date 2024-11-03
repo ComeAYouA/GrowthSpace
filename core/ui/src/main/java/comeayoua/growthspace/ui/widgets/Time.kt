@@ -47,6 +47,7 @@ fun WeekRow(
     modifier: Modifier = Modifier,
     currentDayIdx: Int,
     selectedTabs: Set<Int>,
+    showToday: Boolean = true,
     onTabClick: (idx: Int, isSelected: Boolean) -> Unit = {_, _ -> },
 ){
     val days: Array<DayTab> = remember {
@@ -66,17 +67,20 @@ fun WeekRow(
             WeekRowTab(
                 tab.name,
                 tab.isSelected,
-                tab.isToday
+                tab.isToday,
+                showToday
             ){ isSelected -> onTabClick(idx, isSelected) }
         }
     }
 }
 
+//TODO: showToday Можно переделать в context
 @Composable
 internal fun WeekRowTab(
     name: String = "Mon",
     isSelected: Boolean = false,
     isToday: Boolean = false,
+    showToday: Boolean = true,
     onTabClick: (isSelected: Boolean) -> Unit = {}
 ) {
     val density = LocalDensity.current
@@ -86,7 +90,7 @@ internal fun WeekRowTab(
     val selected = remember { mutableStateOf(isSelected) }
 
     val background by animateColorAsState(
-        targetValue = if (isToday) {
+        targetValue = if (isToday && showToday) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
             Color.Transparent
@@ -166,6 +170,7 @@ fun WeekRowPreview(){
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(8.dp),
         currentDayIdx = 1,
-        selectedTabs = setOf(1)
+        selectedTabs = setOf(1),
+        showToday = true
     )
 }

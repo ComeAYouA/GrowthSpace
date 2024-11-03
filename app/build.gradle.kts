@@ -24,7 +24,8 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":sync"))
     implementation(project(":feature:login"))
-    implementation(project(":feature:projects"))
+    implementation(project(":feature:project-list"))
+    implementation(project(":feature:project-add"))
     implementation(project(":feature:onboarding"))
     implementation(libs.hilt.ext.work)
 }

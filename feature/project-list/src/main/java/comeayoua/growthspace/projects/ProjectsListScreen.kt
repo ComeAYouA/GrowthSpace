@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,11 +66,12 @@ import comeayoua.growthspace.model.ProjectSchedule
 import comeayoua.growthspace.ui.widgets.WeekRow
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectsScreen(
+fun ProjectsListScreen(
     modifier: Modifier = Modifier,
-    viewModel: ProjectsViewModel = hiltViewModel()
+    onCreateProject: () -> Unit,
+    viewModel: ProjectsListViewModel = hiltViewModel()
 ) {
     val pagerState = rememberPagerState { 2 }
 
@@ -116,7 +116,7 @@ fun ProjectsScreen(
                 actions = {
                     IconButton(
                         modifier = Modifier,
-                        onClick = { viewModel.addProject() }
+                        onClick = onCreateProject
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -188,7 +188,6 @@ fun Projects(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Tabs(
     modifier: Modifier = Modifier,
