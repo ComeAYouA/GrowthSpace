@@ -18,6 +18,7 @@ internal const val VERSION_LIST_KEY = "version_list"
 internal class VersionListStoreImpl @Inject constructor(
     @UserPreferencesDataStore private val dataStore: DataStore<Preferences>
 ): VersionListStore {
+    // TODO: implement correct versionList
     override suspend fun getVersionList(): VersionList {
         val versionListKey = stringPreferencesKey(VERSION_LIST_KEY)
 

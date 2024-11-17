@@ -10,7 +10,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -22,16 +22,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-@Preview
 @Composable
 fun DefaultTextField(
     modifier: Modifier = Modifier,
-    onValueChanged: (String) -> Unit = {},
     hintColor: Color = Color.Gray,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     hint: String = "",
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    queue: MutableState<String> = rememberSaveable { mutableStateOf("") },
+    query: State<String>,
+    onValueChanged: (String) -> Unit,
     singleLine: Boolean = true
 ){
     BasicTextField(
@@ -40,11 +39,9 @@ fun DefaultTextField(
             .wrapContentHeight()
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 12.dp),
-        value = queue.value,
+        value = query.value,
         onValueChange = {
-            queue.value = it
             onValueChanged(it)
-
         },
         singleLine = singleLine,
         visualTransformation = visualTransformation,
@@ -57,7 +54,7 @@ fun DefaultTextField(
                 modifier = Modifier,
                 contentAlignment = Alignment.CenterStart
             ){
-                if (queue.value.isEmpty()){
+                if (query.value.isEmpty()){
                     Text(
                         text = hint,
                         color = hintColor

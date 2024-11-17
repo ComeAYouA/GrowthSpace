@@ -90,7 +90,7 @@ class OfflineFirstProjectsRepository @Inject constructor(
 
     override fun getProject(id: Int): Flow<Project> {
         return projectsDataBase.getProject(id).map { project ->
-            project?.asExternalModel()?:throw Exception("There is no projects with given id")
+            project?.asExternalModel() ?: throw Exception("There is no projects with given id")
         }
     }
 

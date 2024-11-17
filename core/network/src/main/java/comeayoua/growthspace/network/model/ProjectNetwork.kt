@@ -1,10 +1,8 @@
 package comeayoua.growthspace.network.model
 
 import comeayoua.growthspace.model.Project
-import comeayoua.growthspace.model.ProjectSchedule
-import comeayoua.growthspace.model.ProjectType
-import comeayoua.growthspace.util.ProjectScheduleSerializer
-import comeayoua.growthspace.util.ProjectTypeSerializer
+import comeayoua.growthspace.model.HabitSchedule
+import comeayoua.growthspace.util.HabitScheduleSerializer
 import comeayoua.growthspace.util.UUIDSerializer
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
@@ -22,9 +20,7 @@ data class ProjectNetwork(
     val description: String,
     @SerialName("is_public")
     val isPublic: Boolean,
-    @SerialName("project_type")
-    @Serializable(with = ProjectTypeSerializer::class)
-    val projectType: ProjectType,
+    // TODO: Delete projectType from server
     @SerialName("created_at")
     val createdAt: LocalDateTime,
     @SerialName("progress")
@@ -34,9 +30,13 @@ data class ProjectNetwork(
     val ownerId: UUID,
     @SerialName("streak")
     val streak: Int,
+    // TODO: Add repeat field to server
+    val repeat: Boolean,
+    // TODO: Add remind field to server
+    val remind: Boolean,
     @SerialName("project_schedule")
-    @Serializable(with = ProjectScheduleSerializer::class)
-    val projectSchedule: ProjectSchedule
+    @Serializable(with = HabitScheduleSerializer::class)
+    val schedule: HabitSchedule
 )
 
 
@@ -46,10 +46,11 @@ fun Project.toExpandedNetworkResource(): ProjectNetwork =
         name = name,
         description = description,
         isPublic = isPublic,
-        projectType = projectType,
         createdAt = createdAt,
         progress = progress,
         ownerId = ownerId,
         streak = streak,
-        projectSchedule = projectSchedule
+        schedule = schedule,
+        repeat = repeat,
+        remind = remind
     )

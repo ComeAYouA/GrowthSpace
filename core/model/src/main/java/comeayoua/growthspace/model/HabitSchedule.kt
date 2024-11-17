@@ -3,7 +3,7 @@ package comeayoua.growthspace.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProjectSchedule(
+data class HabitSchedule(
     val monday: Boolean = false,
     val tuesday: Boolean = false,
     val wednesday: Boolean = false,

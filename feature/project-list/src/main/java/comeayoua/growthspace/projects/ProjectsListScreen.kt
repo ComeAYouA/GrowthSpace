@@ -1,5 +1,6 @@
 package comeayoua.growthspace.projects
 
+import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -41,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,9 +63,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import comeayoua.growthspace.core.ui.R
-import comeayoua.growthspace.model.ProjectSchedule
+import comeayoua.growthspace.model.HabitSchedule
 import comeayoua.growthspace.ui.widgets.WeekRow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -290,7 +294,7 @@ fun ProjectItem(
     modifier: Modifier = Modifier,
     title: String = "No smoking",
     routineType: String = "Everyday",
-    schedule: ProjectSchedule = ProjectSchedule(
+    schedule: HabitSchedule = HabitSchedule(
         thursday = true, sunday = true
     )
 ){

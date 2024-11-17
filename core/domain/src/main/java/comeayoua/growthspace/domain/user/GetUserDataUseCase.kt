@@ -1,4 +1,4 @@
-package comeayoua.growthspace.domain
+package comeayoua.growthspace.domain.user
 
 import comeayoua.growthspace.data.UserDataRepository
 import comeayoua.growthspace.model.UserData

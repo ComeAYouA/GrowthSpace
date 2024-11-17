@@ -55,7 +55,8 @@ class LoginViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                handleLoginException(e)
+//                handleLoginException(e)
+                throw e
             }
 
             signInResult.getOrNull()?.let { success ->

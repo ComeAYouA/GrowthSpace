@@ -8,11 +8,12 @@ data class Project(
     val name: String,
     val description: String,
     val isPublic: Boolean,
-    val projectType: ProjectType,
     val createdAt: LocalDateTime,
     val progress: Int,
     val ownerId: UUID,
     val streak: Int,
-    val projectSchedule: ProjectSchedule,
+    val repeat: Boolean,
+    val remind: Boolean,
+    val schedule: HabitSchedule,
     var isSynced: Boolean = false
 )

@@ -2,7 +2,7 @@ package comeayoua.growthspace
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import comeayoua.growthspace.domain.GetUserDataUseCase
+import comeayoua.growthspace.domain.user.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

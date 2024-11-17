@@ -3,11 +3,13 @@ package comeayoua.growthspace.database.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import comeayoua.growthspace.model.Project
-import comeayoua.growthspace.model.ProjectSchedule
-import comeayoua.growthspace.model.ProjectType
+import comeayoua.growthspace.model.HabitSchedule
 import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 
+// TODO: Consider to implement another type of daysOfWeek field to support different repeat types
+// TODO: Implement reminder field
+// TODO: Add tree skin field (in future)
 @Entity
 data class ProjectEntity(
     @PrimaryKey
@@ -15,12 +17,13 @@ data class ProjectEntity(
     val name: String,
     val description: String,
     val isPublic: Boolean,
-    val projectType: ProjectType,
     val createdAt: LocalDateTime,
     val progress: Int,
     val ownerId: UUID,
     val streak: Int,
-    val daysOfWeek: ProjectSchedule,
+    val repeat: Boolean,
+    val remind: Boolean,
+    val schedule: HabitSchedule,
     var isSynced: Boolean = false
 )
 
@@ -30,12 +33,13 @@ fun ProjectEntity.asExternalModel(): Project
         name = this.name,
         description = this.description,
         isPublic = this.isPublic,
-        projectType = this.projectType,
         createdAt = this.createdAt,
         progress = this.progress,
         ownerId = this.ownerId,
         streak = this.streak,
-        projectSchedule = this.daysOfWeek,
+        schedule = this.schedule,
+        repeat = this.repeat,
+        remind = this.remind,
         isSynced = isSynced
     )
 
@@ -45,11 +49,12 @@ fun Project.asEntity(): ProjectEntity
         name = this.name,
         description = this.description,
         isPublic = this.isPublic,
-        projectType = this.projectType,
         createdAt = this.createdAt,
         progress = this.progress,
         ownerId = this.ownerId,
         streak = this.streak,
-        daysOfWeek = this.projectSchedule,
+        schedule = this.schedule,
+        repeat = this.repeat,
+        remind = this.remind,
         isSynced = this.isSynced
     )

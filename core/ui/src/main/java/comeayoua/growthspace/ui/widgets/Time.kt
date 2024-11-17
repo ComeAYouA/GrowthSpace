@@ -74,7 +74,7 @@ fun WeekRow(
     }
 }
 
-//TODO: showToday Можно переделать в context
+// TODO: showToday Можно переделать в context
 @Composable
 internal fun WeekRowTab(
     name: String = "Mon",

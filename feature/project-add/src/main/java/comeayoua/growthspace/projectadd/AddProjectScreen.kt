@@ -15,7 +15,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,8 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,13 +39,15 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import comeayoua.growthspace.ui.widgets.DefaultTextField
 import comeayoua.growthspace.ui.widgets.WeekRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProjectScreen(
-    onAddProject: () -> Unit
+    onAddProject: () -> Unit,
+    viewModel: AddProjectViewModel = hiltViewModel()
 ){
     val topBarState = rememberTopAppBarState()
 
@@ -53,20 +57,30 @@ fun AddProjectScreen(
 
     val layoutDirection = LocalLayoutDirection.current
 
-    val repeatableChecked = remember {
-        mutableStateOf(true)
-    }
-    val reminderChecked = remember {
-        mutableStateOf(true)
-    }
-    val publicChecked = remember {
-        mutableStateOf(false)
-    }
+    val nameState = viewModel.name.collectAsState()
+    val descriptionState = viewModel.description.collectAsState()
+    val scheduleState by viewModel.schedule.collectAsState()
+    val repeatableChecked by viewModel.repeat.collectAsState()
+    val reminderChecked by viewModel.remind.collectAsState()
+    val publicChecked by viewModel.isPublic.collectAsState()
 
     Scaffold(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    viewModel.addHabit()
+                    onAddProject.invoke()
+                }
+            ){
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "add habit"
+                )
+            }
+        },
         topBar = {
             MediumTopAppBar(
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -114,7 +128,9 @@ fun AddProjectScreen(
                 DefaultTextField(
                     modifier = Modifier
                         .padding(top = 16.dp),
-                    hint = "Title"
+                    hint = "Title",
+                    query = nameState,
+                    onValueChanged = viewModel::setProjectName
                 )
             }
             item {
@@ -122,6 +138,8 @@ fun AddProjectScreen(
                     modifier = Modifier
                         .padding(top = 16.dp),
                     hint = "Description",
+                    query = descriptionState,
+                    onValueChanged = viewModel::setProjectDescription,
                     singleLine = false
                 )
             }
@@ -129,12 +147,12 @@ fun AddProjectScreen(
                 SelectableSection(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "Repeat",
-                    checked = repeatableChecked.value,
-                    onCheckedChanged = { checked -> repeatableChecked.value = checked }
+                    checked = repeatableChecked,
+                    onCheckedChanged = viewModel::setRepeat
                 )
             }
             item {
-                if (repeatableChecked.value){
+                if (repeatableChecked){
                     RepeatSettingsSection(
                         modifier = Modifier
                             .padding(top = 16.dp)
@@ -146,16 +164,16 @@ fun AddProjectScreen(
                 SelectableSection(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "Reminder",
-                    checked = reminderChecked.value,
-                    onCheckedChanged = { checked -> reminderChecked.value = checked }
+                    checked = reminderChecked,
+                    onCheckedChanged = viewModel::setRemind
                 )
             }
             item {
                 SelectableSection(
                     modifier = Modifier.padding(top = 16.dp),
-                    text = "Repeat",
-                    checked = publicChecked.value,
-                    onCheckedChanged = { checked -> publicChecked.value = checked }
+                    text = "Public",
+                    checked = publicChecked,
+                    onCheckedChanged = viewModel::setPublicStatus
                 )
             }
         }
@@ -217,6 +235,7 @@ fun SelectableSection(
     }
 }
 
+// TODO: Set current day
 @Composable
 fun RepeatSettingsSection(
     modifier: Modifier = Modifier

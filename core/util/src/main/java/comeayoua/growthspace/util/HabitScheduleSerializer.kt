@@ -1,6 +1,6 @@
 package comeayoua.growthspace.util
 
-import comeayoua.growthspace.model.ProjectSchedule
+import comeayoua.growthspace.model.HabitSchedule
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -9,15 +9,15 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
-object ProjectScheduleSerializer : KSerializer<ProjectSchedule> {
+object HabitScheduleSerializer : KSerializer<HabitSchedule> {
     override val descriptor = PrimitiveSerialDescriptor("ProjectSchedule", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): ProjectSchedule {
+    override fun deserialize(decoder: Decoder): HabitSchedule {
         val input = decoder.decodeString()
-        return Json.decodeFromString<ProjectSchedule>(input)
+        return Json.decodeFromString<HabitSchedule>(input)
     }
 
-    override fun serialize(encoder: Encoder, value: ProjectSchedule) {
+    override fun serialize(encoder: Encoder, value: HabitSchedule) {
         encoder.encodeString(Json.encodeToString(value))
     }
 }
