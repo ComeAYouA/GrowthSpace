@@ -14,6 +14,6 @@ data class Project(
     val streak: Int,
     val repeat: Boolean,
     val remind: Boolean,
-    val schedule: HabitSchedule,
+    val schedule: Schedule,
     var isSynced: Boolean = false
 )

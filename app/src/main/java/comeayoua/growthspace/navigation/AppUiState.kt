@@ -38,14 +38,9 @@ class AppUiState(
         return if (userData.isUserLoggedIn) {
             "PROJECTS_ROUTE"
         } else {
-            if (userData.isOnboarded){
-                "LOGIN_ROUTE"
-            } else {
-                "ONBOARDING_ROUTE"
-            }
+            "ONBOARDING_ROUTE"
         }
     }
-
     val shouldShowBottomNavigationBar: Boolean
         get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
 

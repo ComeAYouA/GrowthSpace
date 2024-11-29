@@ -1,8 +1,8 @@
 package comeayoua.growthspace.database
 
 import androidx.room.TypeConverter
-import comeayoua.growthspace.model.HabitSchedule
 import comeayoua.growthspace.model.ProjectType
+import comeayoua.growthspace.model.Schedule
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -40,7 +40,7 @@ internal class ProjectsTypeConverter {
         return UUID.fromString(value)
     }
     @TypeConverter
-    fun fromProjectScheduleToString(schedule: HabitSchedule) = Json.encodeToString(schedule)
+    fun fromProjectScheduleToString(schedule: Schedule) = Json.encodeToString(schedule)
     @TypeConverter
-    fun fromJsonToProjectSchedule(json: String) = Json.decodeFromString<HabitSchedule>(json)
+    fun fromJsonToProjectSchedule(json: String) = Json.decodeFromString<Schedule>(json)
 }

@@ -31,6 +31,8 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,8 +42,12 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import comeayoua.growthspace.model.Schedule
+import comeayoua.growthspace.model.ScheduleType
+import comeayoua.growthspace.model.ScheduleValue
 import comeayoua.growthspace.ui.widgets.DefaultTextField
 import comeayoua.growthspace.ui.widgets.WeekRow
+import comeayoua.growthspace.ui.widgets.WeekRowValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +76,7 @@ fun AddProjectScreen(
             .fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = {
                     viewModel.addHabit()
                     onAddProject.invoke()
@@ -156,7 +163,9 @@ fun AddProjectScreen(
                     RepeatSettingsSection(
                         modifier = Modifier
                             .padding(top = 16.dp)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        schedule = scheduleState,
+                        onScheduleChanged = viewModel::setSchedule
                     )
                 }
             }
@@ -238,8 +247,24 @@ fun SelectableSection(
 // TODO: Set current day
 @Composable
 fun RepeatSettingsSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    schedule: Schedule,
+    onScheduleChanged: (Schedule) -> Unit
 ){
+
+    val tabs = remember {
+        mutableStateOf(
+            WeekRowValue(
+                monday = schedule.value?.days?.contains(1) ?: (schedule.type == ScheduleType.DAILY),
+                tuesday = schedule.value?.days?.contains(2) ?: (schedule.type == ScheduleType.DAILY),
+                wednsday = schedule.value?.days?.contains(3) ?: (schedule.type == ScheduleType.DAILY),
+                thusday = schedule.value?.days?.contains(4) ?: (schedule.type == ScheduleType.DAILY),
+                friday = schedule.value?.days?.contains(5) ?: (schedule.type == ScheduleType.DAILY),
+                saturday = schedule.value?.days?.contains(6) ?: (schedule.type == ScheduleType.DAILY),
+                sunday = schedule.value?.days?.contains(7) ?: (schedule.type == ScheduleType.DAILY),
+            )
+        )
+    }
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -249,7 +274,7 @@ fun RepeatSettingsSection(
         Text(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
-            text = "Daily",
+            text = "Weekly",
         )
 
         WeekRow(
@@ -260,7 +285,20 @@ fun RepeatSettingsSection(
                 ),
             currentDayIdx = 1,
             showToday = false,
-            selectedTabs = setOf(1)
+            tabs = tabs,
+            onTabClick = { idx, selected ->
+                val newValue = when{
+                    (schedule.value?.days?.contains(idx) == selected) -> schedule.value?.days
+                    else -> {
+                        schedule.value?.days?.toMutableList()?.apply {
+                            if (selected) add(idx) else remove(idx)
+                        }
+                    }
+                }
+                onScheduleChanged.invoke(
+                    schedule.copy(value = newValue?.let { ScheduleValue(it) })
+                )
+            }
         )
     }
 }

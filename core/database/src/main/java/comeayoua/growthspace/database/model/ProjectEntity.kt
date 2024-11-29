@@ -3,12 +3,10 @@ package comeayoua.growthspace.database.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import comeayoua.growthspace.model.Project
-import comeayoua.growthspace.model.HabitSchedule
+import comeayoua.growthspace.model.Schedule
 import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 
-// TODO: Consider to implement another type of daysOfWeek field to support different repeat types
-// TODO: Implement reminder field
 // TODO: Add tree skin field (in future)
 @Entity
 data class ProjectEntity(
@@ -23,7 +21,7 @@ data class ProjectEntity(
     val streak: Int,
     val repeat: Boolean,
     val remind: Boolean,
-    val schedule: HabitSchedule,
+    val schedule: Schedule,
     var isSynced: Boolean = false
 )
 

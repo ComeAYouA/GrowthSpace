@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import comeayoua.growthspace.domain.project.AddProjectsUseCase
 import comeayoua.growthspace.domain.user.GetUserUUIDUseCase
-import comeayoua.growthspace.model.HabitSchedule
 import comeayoua.growthspace.model.Project
+import comeayoua.growthspace.model.Schedule
+import comeayoua.growthspace.model.ScheduleType
+import comeayoua.growthspace.model.ScheduleValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,9 +39,16 @@ class AddProjectViewModel @Inject constructor(
     val remind = _remind.asStateFlow()
     fun setRemind(remind: Boolean) = _remind.update { remind }
 
-    private val _schedule = MutableStateFlow(HabitSchedule())
+    private val _schedule = MutableStateFlow(
+        Schedule(
+            type = ScheduleType.WEEKLY,
+            ScheduleValue(
+                listOf()
+            )
+        )
+    )
     val schedule = _schedule.asStateFlow()
-    fun setSchedule(schedule: HabitSchedule) = _schedule.update { schedule }
+    fun setSchedule(schedule: Schedule) = _schedule.update { schedule }
 
     private val _isPublic = MutableStateFlow(true)
     val isPublic = _isPublic.asStateFlow()

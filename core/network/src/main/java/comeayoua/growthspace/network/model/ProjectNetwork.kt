@@ -1,8 +1,7 @@
 package comeayoua.growthspace.network.model
 
 import comeayoua.growthspace.model.Project
-import comeayoua.growthspace.model.HabitSchedule
-import comeayoua.growthspace.util.HabitScheduleSerializer
+import comeayoua.growthspace.model.Schedule
 import comeayoua.growthspace.util.UUIDSerializer
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
@@ -35,8 +34,7 @@ data class ProjectNetwork(
     // TODO: Add remind field to server
     val remind: Boolean,
     @SerialName("project_schedule")
-    @Serializable(with = HabitScheduleSerializer::class)
-    val schedule: HabitSchedule
+    val schedule: Schedule
 )
 
 

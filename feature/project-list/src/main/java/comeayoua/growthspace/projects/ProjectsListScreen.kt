@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
@@ -40,9 +42,11 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,18 +61,24 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import comeayoua.growthspace.core.ui.R
-import comeayoua.growthspace.model.HabitSchedule
+import comeayoua.growthspace.model.Project
+import comeayoua.growthspace.model.Schedule
+import comeayoua.growthspace.model.ScheduleType
+import comeayoua.growthspace.model.ScheduleValue
 import comeayoua.growthspace.ui.widgets.WeekRow
-import kotlinx.coroutines.flow.last
+import comeayoua.growthspace.ui.widgets.WeekRowValue
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,19 +91,58 @@ fun ProjectsListScreen(
 
     val topBarState = rememberTopAppBarState()
 
+    val projectsState by viewModel.projectsState.collectAsState()
+
     val topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = topBarState
     )
 
-    val isTopBarCollapsed = remember {
+    val isTopBarCollapsed by remember {
         derivedStateOf {
             topBarState.collapsedFraction >= 0.9f
         }
     }
 
+    val content:  @Composable (BoxScope.() -> Unit) = {
+        Column {
+            Tabs(
+                pagerState = pagerState,
+                divider = { isTopBarCollapsed }
+            )
+            HorizontalPager(
+                state = pagerState,
+                flingBehavior = PagerDefaults.flingBehavior(
+                    state = pagerState,
+                    snapAnimationSpec = spring(
+                        stiffness = Spring.StiffnessMedium
+                    ),
+                    snapPositionalThreshold = 0.3f
+                )
+            ) { page ->
+                when(page){
+                    0 -> Projects(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+                        projects = projectsState,
+                        onScheduleChanged = {}
+                    )
+                    1 -> Projects(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+                        projects = listOf(),
+                        onScheduleChanged = {}
+                    )
+                }
+            }
+        }
+    }
+
     Scaffold(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         topBar = {
             MediumTopAppBar(
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -132,61 +181,28 @@ fun ProjectsListScreen(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            Tabs(
-                pagerState = pagerState,
-                divider = { isTopBarCollapsed.value }
-            )
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-            ){
-                HorizontalPager(
-                    state = pagerState,
-                    flingBehavior = PagerDefaults.flingBehavior(
-                        state = pagerState,
-                        snapAnimationSpec = spring(
-                            stiffness = Spring.StiffnessMedium
-                        ),
-                        snapPositionalThreshold = 0.3f
-                    )
-                ) { page ->
-                    when(page){
-                        0 -> Projects(
-                            modifier = Modifier.fillMaxSize(),
-                            items = 10,
-                            nestedScrollConnection = topAppBarScrollBehavior.nestedScrollConnection
-                        )
-                        1 -> Projects(
-                            modifier = Modifier.fillMaxSize(),
-                            items = 11,
-                            nestedScrollConnection = topAppBarScrollBehavior.nestedScrollConnection
-                        )
-                    }
-                }
-            }
-        }
+        Box(modifier = Modifier.padding(paddingValues), content = content)
     }
-
 }
 
 @Composable
 fun Projects(
     modifier: Modifier = Modifier,
-    nestedScrollConnection: NestedScrollConnection,
-    items: Int = 0
+    projects: List<Project>,
+    onScheduleChanged: (Schedule) -> Unit
 ){
 
     LazyColumn(
         modifier = modifier
-            .padding(horizontal = 16.dp)
-            .nestedScroll(nestedScrollConnection),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(top = 16.dp),
     ) {
-        this.items(items){
+        this.items(projects){ project ->
             ProjectItem(
-                title = "Tree #$it"
+                title = project.name,
+                schedule = project.schedule,
+                onScheduleChanged = onScheduleChanged,
             )
         }
     }
@@ -288,29 +304,28 @@ fun Tabs(
     }
 }
 
-@Preview
 @Composable
 fun ProjectItem(
     modifier: Modifier = Modifier,
-    title: String = "No smoking",
-    routineType: String = "Everyday",
-    schedule: HabitSchedule = HabitSchedule(
-        thursday = true, sunday = true
-    )
+    title: String,
+    schedule: Schedule,
+    onScheduleChanged: (Schedule) -> Unit
 ){
-    val daysOfWeek = remember {
-        listOf(
-            schedule.monday,
-            schedule.tuesday,
-            schedule.wednesday,
-            schedule.thursday,
-            schedule.friday,
-            schedule.saturday,
-            schedule.sunday,
+    val tabs = remember {
+        mutableStateOf(
+            WeekRowValue(
+                monday = schedule.value?.days?.contains(1) ?: (schedule.type == ScheduleType.DAILY),
+                tuesday = schedule.value?.days?.contains(2) ?: (schedule.type == ScheduleType.DAILY),
+                wednsday = schedule.value?.days?.contains(3) ?: (schedule.type == ScheduleType.DAILY),
+                thusday = schedule.value?.days?.contains(4) ?: (schedule.type == ScheduleType.DAILY),
+                friday = schedule.value?.days?.contains(5) ?: (schedule.type == ScheduleType.DAILY),
+                saturday = schedule.value?.days?.contains(6) ?: (schedule.type == ScheduleType.DAILY),
+                sunday = schedule.value?.days?.contains(7) ?: (schedule.type == ScheduleType.DAILY),
+            )
         )
     }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(14.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(16.dp)
@@ -330,7 +345,7 @@ fun ProjectItem(
                     .padding(horizontal = 16.dp),
             ){
                 Text(
-                    text = routineType,
+                    text = schedule.type.name.lowercase().replaceFirstChar { it.uppercaseChar() },
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Normal
                 )
@@ -349,7 +364,20 @@ fun ProjectItem(
                     top = 8.dp
                 ),
             currentDayIdx = 1,
-            selectedTabs = setOf(1)
+            tabs = tabs,
+            onTabClick = { idx, selected ->
+                val newValue = when{
+                    (schedule.value?.days?.contains(idx) == selected) -> schedule.value?.days
+                    else -> {
+                        schedule.value?.days?.toMutableList()?.apply {
+                            if (selected) add(idx) else remove(idx)
+                        }
+                    }
+                }
+                onScheduleChanged.invoke(
+                    schedule.copy(value = newValue?.let { ScheduleValue(it) })
+                )
+            }
         )
     }
 }

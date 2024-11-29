@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,41 +36,47 @@ import androidx.compose.ui.unit.sp
 
 internal val dayOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun")
 
-@Stable
-internal data class DayTab(
-    val name: String,
-    val isSelected: Boolean,
-    val isToday: Boolean
+data class WeekRowValue(
+    var monday: Boolean,
+    var tuesday: Boolean,
+    var wednsday: Boolean,
+    var thusday: Boolean,
+    var friday: Boolean,
+    var saturday: Boolean,
+    var sunday: Boolean,
 )
 
 @Composable
 fun WeekRow(
     modifier: Modifier = Modifier,
     currentDayIdx: Int,
-    selectedTabs: Set<Int>,
+    tabs: State<WeekRowValue>,
     showToday: Boolean = true,
     onTabClick: (idx: Int, isSelected: Boolean) -> Unit = {_, _ -> },
 ){
-    val days: Array<DayTab> = remember {
-        Array(7) { idx ->
-            DayTab(
-                name = dayOfWeek[idx],
-                isSelected = selectedTabs.contains(idx),
-                isToday = idx == currentDayIdx
-            )
-        }
+    val tabsState = remember { tabs.value }
+    val selectedTabs = remember {
+        listOf(
+            tabsState.monday,
+            tabsState.tuesday,
+            tabsState.wednsday,
+            tabsState.thusday,
+            tabsState.friday,
+            tabsState.saturday,
+            tabsState.sunday
+        )
     }
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
-        days.forEachIndexed { idx, tab ->
+        selectedTabs.forEachIndexed { idx, selected ->
             WeekRowTab(
-                tab.name,
-                tab.isSelected,
-                tab.isToday,
+                dayOfWeek[idx],
+                isSelected = selected,
+                isToday = idx == currentDayIdx,
                 showToday
-            ){ isSelected -> onTabClick(idx, isSelected) }
+            ){ isSelected -> onTabClick(idx + 1, isSelected) }
         }
     }
 }
@@ -144,7 +151,10 @@ internal fun WeekRowTab(
                 }
                 .border(
                     2.dp,
-                    if (!selected.value) MaterialTheme.colorScheme.inversePrimary else Color.Transparent,
+                    if (!selected.value)
+                        MaterialTheme.colorScheme.inversePrimary
+                    else
+                        Color.Transparent,
                     CircleShape
                 )
         ) {
@@ -165,12 +175,35 @@ internal fun WeekRowTab(
 @Preview
 @Composable
 fun WeekRowPreview(){
+    val tabs = remember {
+        mutableStateOf(
+            WeekRowValue(
+                monday = true,
+                tuesday = true,
+                wednsday = false,
+                thusday = false,
+                friday = true,
+                saturday = false,
+                sunday = true
+            )
+        )
+    }
     WeekRow(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(8.dp),
         currentDayIdx = 1,
-        selectedTabs = setOf(1),
-        showToday = true
+        tabs = tabs,
+        onTabClick = { idx, selected ->
+            when(idx) {
+                1 -> tabs.value = tabs.value.copy(monday = selected)
+                2 -> tabs.value = tabs.value.copy(tuesday = selected)
+                3 -> tabs.value = tabs.value.copy(wednsday = selected)
+                4 -> tabs.value = tabs.value.copy(thusday = selected)
+                5 -> tabs.value = tabs.value.copy(friday = selected)
+                6 -> tabs.value = tabs.value.copy(saturday = selected)
+                7 -> tabs.value = tabs.value.copy(sunday = selected)
+            }
+        }
     )
 }
