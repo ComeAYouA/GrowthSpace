@@ -65,10 +65,11 @@ class ProjectsApiImpl @Inject constructor(
         }
     }
 
+    //TODO: ifEmpty fallback
     override suspend fun getProjectsVersion(): Int {
         return withContext(Dispatchers.IO){
             supabase.from("user_version_list")
-                .select().decodeAs<ExpandedVersionList>().projectsVersion
+                .select().decodeAs<List<ExpandedVersionList>>().first().projectsVersion
         }
     }
 }

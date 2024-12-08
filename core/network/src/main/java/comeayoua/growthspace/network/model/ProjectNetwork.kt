@@ -19,7 +19,6 @@ data class ProjectNetwork(
     val description: String,
     @SerialName("is_public")
     val isPublic: Boolean,
-    // TODO: Delete projectType from server
     @SerialName("created_at")
     val createdAt: LocalDateTime,
     @SerialName("progress")
@@ -29,9 +28,7 @@ data class ProjectNetwork(
     val ownerId: UUID,
     @SerialName("streak")
     val streak: Int,
-    // TODO: Add repeat field to server
     val repeat: Boolean,
-    // TODO: Add remind field to server
     val remind: Boolean,
     @SerialName("project_schedule")
     val schedule: Schedule

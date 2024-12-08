@@ -21,6 +21,10 @@ class ProjectsListViewModel @Inject constructor(
     private val getProjectsUseCase: GetProjectsUseCase,
     private val syncManager: SyncManager
 ): ViewModel() {
+    init {
+        syncManager.enqueueSync()
+    }
+
     val projectsState = getProjectsUseCase.invoke()
         .onEach {
             Log.d("myTag", it.toString())

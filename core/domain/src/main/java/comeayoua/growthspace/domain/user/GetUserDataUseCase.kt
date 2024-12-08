@@ -1,5 +1,6 @@
 package comeayoua.growthspace.domain.user
 
+import android.util.Log
 import comeayoua.growthspace.data.UserDataRepository
 import comeayoua.growthspace.model.UserData
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class GetUserDataUseCase @Inject constructor(
-    private val userDataRepository: UserDataRepository
+    private val userDataRepository: UserDataRepository,
 ){
     operator fun invoke(): Flow<UserData> {
         val getTokenFlow = userDataRepository.getToken()

@@ -1,5 +1,6 @@
 package comeayoua.growthspace.data.repository
 
+import android.util.Log
 import comeayoua.growthspace.data.ProjectsRepository
 import comeayoua.growthspace.database.ProjectsDao
 import comeayoua.growthspace.database.model.ProjectEntity
@@ -7,10 +8,12 @@ import comeayoua.growthspace.database.model.asEntity
 import comeayoua.growthspace.database.model.asExternalModel
 import comeayoua.growthspace.datastore.VersionListStore
 import comeayoua.growthspace.model.Project
+import comeayoua.growthspace.model.VersionList
 import comeayoua.growthspace.network.ProjectsApi
 import comeayoua.growthspace.network.model.asExternalModel
 import comeayoua.growthspace.network.model.toExpandedNetworkResource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 import java.lang.Integer.max
 import javax.inject.Inject
@@ -24,8 +27,10 @@ class OfflineFirstProjectsRepository @Inject constructor(
 ): ProjectsRepository {
     override suspend fun syncData(): Boolean {
         return try {
-            val version = versionListStore.getVersionList().projectsListVersion
+//            versionListStore.updateVersionList { VersionList() }
+            val version = versionListStore.getVersionList().projectsListVersion ?: 0
 
+            Log.d("myTag", "version: $version")
             // fetching network updates
             val updates = projectsApi.getUpdates(version)
             var nextVersion = version
@@ -78,7 +83,8 @@ class OfflineFirstProjectsRepository @Inject constructor(
             }
 
             true
-        }catch (e: Exception){
+        } catch (e: Exception) {
+            Log.d("myTag", e.toString())
             false
         }
     }

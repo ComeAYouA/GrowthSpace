@@ -7,7 +7,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import comeayoua.growthspace.datastore.UserDataStore
 import comeayoua.growthspace.datastore.VersionListStore
 import comeayoua.growthspace.datastore.prefernces.UserDataStoreImpl
-import comeayoua.growthspace.datastore.prefernces.VersionListStoreImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,7 +27,7 @@ internal interface DataStoreModule {
     fun binds_UserDataStoreImpl_to_UserDataStore(input: UserDataStoreImpl): UserDataStore
 
     @Binds
-    fun binds_VersionListStoreImpl_to_VersionListStore(input: VersionListStoreImpl): VersionListStore
+    fun binds_VersionListStoreImpl_to_VersionListStore(input: UserDataStoreImpl): VersionListStore
 
     companion object{
         private val Context.userDataStore by preferencesDataStore(name = USER_DATA_NAME)

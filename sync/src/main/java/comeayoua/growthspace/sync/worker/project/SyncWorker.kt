@@ -2,6 +2,7 @@ package comeayoua.growthspace.sync.worker.project
 
 import android.app.Notification
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -31,6 +32,7 @@ class SyncWorker @AssistedInject constructor(
             val isSyncSucceed = projectsRepository.syncData()
             if (isSyncSucceed) Result.success() else Result.retry()
         }catch (e: Exception){
+            Log.d("myTag", e.toString())
             Result.retry()
         }
     }
