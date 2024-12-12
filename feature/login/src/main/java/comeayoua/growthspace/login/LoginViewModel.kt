@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import comeayoua.growthspace.domain.login.SignInWithGoogleUseCase
-import comeayoua.growthspace.login.utils.handleLoginException
 import comeayoua.growthspace.login.utils.rawNonceToGoogleOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException

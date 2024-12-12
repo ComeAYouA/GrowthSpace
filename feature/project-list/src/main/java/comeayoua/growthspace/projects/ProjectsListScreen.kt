@@ -58,6 +58,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,6 +71,8 @@ import comeayoua.growthspace.model.ScheduleValue
 import comeayoua.growthspace.ui.widgets.WeekRow
 import comeayoua.growthspace.ui.widgets.WeekRowValue
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toKotlinLocalDateTime
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,14 +119,20 @@ fun ProjectsListScreen(
                             .fillMaxSize()
                             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
                         projects = projectsState,
-                        onScheduleChanged = {}
+                        currentDayIdx = LocalDateTime.now()
+                            .toKotlinLocalDateTime().dayOfWeek.value - 1,
+                        onScheduleChanged = { project, schedule ->
+                            viewModel.changeProjectSchedule(project, schedule)
+                        }
                     )
                     1 -> Projects(
                         modifier = Modifier
                             .fillMaxSize()
                             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
                         projects = listOf(),
-                        onScheduleChanged = {}
+                        currentDayIdx = LocalDateTime.now()
+                            .toKotlinLocalDateTime().dayOfWeek.value - 1,
+                        onScheduleChanged = {project, scheduel -> }
                     )
                 }
             }
@@ -180,9 +189,9 @@ fun ProjectsListScreen(
 fun Projects(
     modifier: Modifier = Modifier,
     projects: List<Project>,
-    onScheduleChanged: (Schedule) -> Unit
+    onScheduleChanged: (Project, Schedule) -> Unit,
+    currentDayIdx: Int
 ){
-
     LazyColumn(
         modifier = modifier
             .padding(horizontal = 16.dp),
@@ -193,7 +202,10 @@ fun Projects(
             ProjectItem(
                 title = project.name,
                 schedule = project.schedule,
-                onScheduleChanged = onScheduleChanged,
+                onScheduleChanged = { schedule ->
+                    onScheduleChanged.invoke(project, schedule)
+                },
+                currentDayIdx = currentDayIdx
             )
         }
     }
@@ -300,6 +312,7 @@ fun ProjectItem(
     modifier: Modifier = Modifier,
     title: String,
     schedule: Schedule,
+    currentDayIdx: Int,
     onScheduleChanged: (Schedule) -> Unit
 ){
     val tabs = remember {
@@ -338,12 +351,15 @@ fun ProjectItem(
                 Text(
                     text = schedule.type.name.lowercase().replaceFirstChar { it.uppercaseChar() },
                     fontSize = 10.sp,
+                    lineHeight = 12.sp,
                     fontWeight = FontWeight.Normal
                 )
 
                 Text(
+                    modifier = Modifier.padding(top = 2.dp),
                     text = title,
                     fontSize = 18.sp,
+                    lineHeight = 20.sp,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -354,7 +370,7 @@ fun ProjectItem(
                 .padding(
                     top = 8.dp
                 ),
-            currentDayIdx = 1,
+            currentDayIdx = currentDayIdx,
             tabs = tabs,
             onTabClick = { idx, selected ->
                 val newValue = when{

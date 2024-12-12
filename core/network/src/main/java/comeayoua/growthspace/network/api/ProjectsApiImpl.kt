@@ -35,6 +35,7 @@ class ProjectsApiImpl @Inject constructor(
     }
 
 
+    //TODO: Delete select after insert
     override suspend fun insertProjects(
         projects: List<ProjectNetwork>
     ): Int {
@@ -55,7 +56,6 @@ class ProjectsApiImpl @Inject constructor(
     override suspend fun updateProjects(
         projects: List<ProjectNetwork>,
     ): Int {
-
         return withContext(Dispatchers.IO) {
             supabase.from("projects").upsert(
                 projects
